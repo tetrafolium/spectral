@@ -60,7 +60,7 @@ export class Spectral {
     target: IParsedResult | object | string,
     opts: IRunOpts = {},
   ): Promise<ISpectralFullResult> {
-    let results: IRuleResult[] = [];
+    const results: IRuleResult[] = [];
 
     let parsedResult: IParsedResult | IParsedResult<YamlParserResult<unknown>>;
     if (!isParsedResult(target)) {
@@ -75,7 +75,7 @@ export class Spectral {
       parsedResult = target;
     }
 
-    results = results.concat(formatParserDiagnostics(parsedResult.parsed.diagnostics, parsedResult.source));
+    results.push(...formatParserDiagnostics(parsedResult.parsed.diagnostics, parsedResult.source));
 
     const documentUri = opts.resolve && opts.resolve.documentUri;
     const refDiagnostics: IRuleResult[] = [];

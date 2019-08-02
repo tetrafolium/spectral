@@ -74,10 +74,10 @@ export const lintNode = (
     });
   }
 
-  let results: IRuleResult[] = [];
+  const results: IRuleResult[] = [];
 
   for (const target of targets) {
-    const targetPath = givenPath.concat(target.path);
+    const targetPath = [...givenPath, ...target.path];
 
     const targetResults =
       apply(
@@ -93,44 +93,39 @@ export const lintNode = (
         },
       ) || [];
 
-    results = results.concat(
-      targetResults.map<IRuleResult>(result => {
-        const escapedJsonPath = (result.path || targetPath).map(segment => decodePointerFragment(String(segment)));
-        const path = getRealJsonPath(
-          rule.resolved === false ? resolved.unresolved : resolved.resolved,
-          escapedJsonPath,
-        );
-        const location = resolved.getLocationForJsonPath(path, true);
+    for (const result of targetResults) {
+      const escapedJsonPath = (result.path || targetPath).map(segment => decodePointerFragment(String(segment)));
+      const path = getRealJsonPath(rule.resolved === false ? resolved.unresolved : resolved.resolved, escapedJsonPath);
+      const location = resolved.getLocationForJsonPath(path, true);
 
-        return {
-          code: rule.name,
+      results.push({
+        code: rule.name,
 
-          message:
-            rule.message === undefined
-              ? rule.description || result.message
-              : message(rule.message, {
-                  error: result.message,
-                  property: path.length > 0 ? path[path.length - 1] : '',
-                  description: rule.description,
-                }),
-          path,
-          severity: getDiagnosticSeverity(rule.severity),
-          source: location.uri,
-          ...(location || {
-            range: {
-              start: {
-                character: 0,
-                line: 0,
-              },
-              end: {
-                character: 0,
-                line: 0,
-              },
+        message:
+          rule.message === undefined
+            ? rule.description || result.message
+            : message(rule.message, {
+                error: result.message,
+                property: path.length > 0 ? path[path.length - 1] : '',
+                description: rule.description,
+              }),
+        path,
+        severity: getDiagnosticSeverity(rule.severity),
+        source: location.uri,
+        ...(location || {
+          range: {
+            start: {
+              character: 0,
+              line: 0,
             },
-          }),
-        };
-      }),
-    );
+            end: {
+              character: 0,
+              line: 0,
+            },
+          },
+        }),
+      });
+    }
   }
 
   return results;
