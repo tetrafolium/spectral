@@ -1,18 +1,22 @@
 import { JsonPath } from '@stoplight/types/dist';
-import { IRunRule } from '../types';
+import { IRunRule, SpectralDiagnosticSeverity } from '../types';
 import { shouldBailOut } from './utils';
 
 const { JSONPath } = require('jsonpath-plus');
 
 export class Rule implements IRunRule {
   public readonly name: string;
-  // public
+  public readonly severity: SpectralDiagnosticSeverity;
+  public readonly formats?: string[];
 
   private readonly query: JsonPath;
   private _bailedOut = false;
   public finished = false;
 
-  constructor(private _rule: IRunRule) {
+  constructor(_rule: IRunRule) {
+    this.name = _rule.name;
+    this.severity = _rule.severity;
+    this.formats = _rule.formats;
     this.query = JSONPath.toPathArray(_rule.given);
     this._bailedOut = shouldBailOut(this.query);
   }
@@ -67,16 +71,3 @@ export class Rule implements IRunRule {
     }
   }
 }
-
-export const isInPath = (obj: object, path: string) => {
-  switch (path) {
-    case '*':
-      // yes, child, easy peasy.
-      break;
-    case '~':
-    case '^':
-      // what now?
-      break;
-    case '..':
-  }
-};

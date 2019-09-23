@@ -3,6 +3,7 @@ import { Resolved } from './resolved';
 const { JSONPath } = require('jsonpath-plus');
 
 import { lintNode } from './linter';
+import { Rule } from './rules/rule';
 import { getDiagnosticSeverity } from './rulesets/severity';
 import { FunctionCollection, IGivenNode, IRuleResult, IRunRule, RunRuleCollection } from './types';
 
@@ -15,9 +16,7 @@ export const runRules = (
 
   for (const name in rules) {
     if (!rules.hasOwnProperty(name)) continue;
-
-    const rule = rules[name];
-    if (!rule) continue;
+    const rule = new Rule(rules[name]);
 
     if (
       rule.formats !== void 0 &&
