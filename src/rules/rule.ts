@@ -26,7 +26,7 @@ export class Rule implements IRunRule {
     this.query.length = 0;
   }
 
-  // this is spaghetti, just trying things out
+  // this is to be sliced into smaller chunk, just trying things out
   private _tryReducing(value: unknown) {
     this.query.shift();
 
@@ -39,6 +39,7 @@ export class Rule implements IRunRule {
       }
 
       if (segment[0] === '?') {
+        // todo: let's have it sandboxed
         const result = Function('__curObj', `return (${segment.slice(1).replace('@', '__curObj')})`)(value);
         if (result) {
           this.query.shift();
