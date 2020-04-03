@@ -59,11 +59,11 @@ function assertValidOptions(opts: ICasingOptions): asserts opts is ICasingOption
     throw new AssertionError({ message: `Invalid '${opts.type}' type value.` });
   }
 
-  if (opts.separator === undefined) {
+  if (opts.separator === void 0) {
     return;
   }
 
-  if (opts.separator.allowLeading !== undefined && opts.separator.char === undefined) {
+  if (opts.separator.allowLeading !== void 0 && opts.separator.char === void 0) {
     throw new AssertionError({
       message: "'separator.allowLeading' can only be valued when 'separator.char' is defined.",
     });

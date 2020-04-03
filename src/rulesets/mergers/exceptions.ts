@@ -37,7 +37,7 @@ const normalize = ($ref: string, rulesetUri?: string): string => {
     throw new InvalidUriError(buildInvalidUriErrorMessage($ref, rulesetUri));
   }
 
-  const path = rulesetUri === undefined || isAbsolute(source) ? source : join(rulesetUri, '..', source);
+  const path = rulesetUri === void 0 || isAbsolute(source) ? source : join(rulesetUri, '..', source);
 
   return pathNormalize(path) + pointer;
 };
@@ -55,7 +55,7 @@ const buildErrorMessagePrefix = ($ref: string, rulesetUri?: string): string => {
 const buildInvalidUriErrorMessage = ($ref: string, rulesetUri?: string, precision?: string): string => {
   return (
     buildErrorMessagePrefix($ref, rulesetUri) +
-    `Key \`${$ref}\` is not a valid uri${precision ? ` (${precision})` : ''}.`
+    `Key \`${$ref}\` is not a valid uri${precision !== void 0 ? ` (${precision})` : ''}.`
   );
 };
 
@@ -66,7 +66,7 @@ export function mergeExceptions(
 ): void {
   for (const [location, sourceRules] of Object.entries(source)) {
     const normalizedLocation = normalize(location, baseUri);
-    const targetRules = target[normalizedLocation] !== undefined ? target[normalizedLocation] : [];
+    const targetRules = target[normalizedLocation] ?? [];
 
     const set = new Set(targetRules);
 

@@ -10,7 +10,7 @@ describe('isParsedResult util', () => {
     expect(isParsedResult({})).toBe(false);
     expect(
       isParsedResult({
-        parsed: undefined,
+        parsed: void 0,
       }),
     ).toBe(false);
 

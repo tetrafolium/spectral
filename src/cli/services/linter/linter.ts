@@ -40,7 +40,7 @@ export async function lint(documents: Array<number | string>, flags: ILintConfig
   for (const [format, lookup, message] of KNOWN_FORMATS) {
     spectral.registerFormat(format, document => {
       if (lookup(document)) {
-        if (!flags.quiet) {
+        if (flags.quiet !== true) {
           console.log(message);
         }
 
@@ -51,8 +51,8 @@ export async function lint(documents: Array<number | string>, flags: ILintConfig
     });
   }
 
-  if (flags.verbose) {
-    if (ruleset) {
+  if (flags.verbose === true) {
+    if (ruleset !== void 0) {
       const rules = Object.values(spectral.rules);
       console.info(`Found ${rules.length} rules (${rules.filter(isRuleEnabled).length} enabled)`);
     } else {

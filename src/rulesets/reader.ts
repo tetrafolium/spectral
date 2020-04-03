@@ -92,10 +92,10 @@ const createRulesetProcessor = (
         let extendedRuleset: IRuleset | null;
         let parentSeverity: FileRulesetSeverity;
         if (Array.isArray(extended)) {
-          parentSeverity = severity === undefined ? extended[1] : severity;
+          parentSeverity = severity === void 0 ? extended[1] : severity;
           extendedRuleset = await processRuleset(rulesetUri, extended[0], parentSeverity);
         } else {
-          parentSeverity = severity === undefined ? 'recommended' : severity;
+          parentSeverity = severity === void 0 ? 'recommended' : severity;
           extendedRuleset = await processRuleset(rulesetUri, extended, parentSeverity);
         }
 
@@ -108,7 +108,7 @@ const createRulesetProcessor = (
     }
 
     if (ruleset.rules !== void 0) {
-      mergeRules(rules, ruleset.rules, severity === undefined ? 'recommended' : severity);
+      mergeRules(rules, ruleset.rules, severity === void 0 ? 'recommended' : severity);
     }
 
     if (ruleset.except !== void 0) {

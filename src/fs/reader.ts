@@ -37,7 +37,7 @@ export async function readFile(name: string | number, opts: IReadOptions): Promi
     let response;
     let timeout: NodeJS.Timeout | number | null = null;
     try {
-      if (opts.timeout) {
+      if (opts.timeout !== void 0) {
         const controller = new AbortController();
         timeout = setTimeout(() => {
           controller.abort();

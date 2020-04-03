@@ -3,10 +3,10 @@
 
 import { IFunction, IFunctionResult, Rule } from '../../../types';
 
-export const oasTagDefined: IFunction<Rule> = (targetVal, _options, functionPaths) => {
+export const oasTagDefined: IFunction<Rule> = (targetVal, _options) => {
   const results: IFunctionResult[] = [];
 
-  const globalTags = (targetVal.tags || []).map(({ name }: { name: string }) => name);
+  const globalTags = (targetVal.tags ?? []).map(({ name }: { name: string }) => name);
 
   const { paths = {} } = targetVal;
 

@@ -16,7 +16,7 @@ export function getDiagnosticErrorMessage(diagnostic: IDiagnostic) {
     prettifiedMessage = prettifiedMessage.replace(/([a-z])([A-Z])/g, splitWord);
   }
 
-  if (key !== undefined) {
+  if (key !== void 0) {
     prettifiedMessage = prettifiedMessage.replace(/(Duplicate key)/, `$1: ${key}`);
   }
 
@@ -26,7 +26,7 @@ export function getDiagnosticErrorMessage(diagnostic: IDiagnostic) {
 export const prettyPrintResolverErrorMessage = (message: string) => message.replace(/^Error\s*:\s*/, '');
 
 const getPropertyKey = (path: JsonPath | undefined): Segment | void => {
-  if (path !== undefined && path.length > 0) {
+  if (path !== void 0 && path.length > 0) {
     return path[path.length - 1];
   }
 };

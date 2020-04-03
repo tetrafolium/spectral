@@ -22,7 +22,7 @@ export function formatOutput(results: IRuleResult[], format: OutputFormat): stri
 }
 
 export async function writeOutput(outputStr: string, outputFile?: string) {
-  if (outputFile) {
+  if (outputFile !== void 0) {
     return writeFileAsync(outputFile, outputStr);
   }
   console.log(outputStr);
