@@ -60,10 +60,22 @@ function getAjv(oasVersion?: Optional<number>): AJV.Ajv {
   // @ts-ignore
   ajv._refs['http://json-schema.org/schema'] = 'http://json-schema.org/draft-04/schema';
 
-  ajv.addFormat('int32', { type: 'number', validate: oasFormatValidator.int32 });
-  ajv.addFormat('int64', { type: 'number', validate: oasFormatValidator.int64 });
-  ajv.addFormat('float', { type: 'number', validate: oasFormatValidator.float });
-  ajv.addFormat('double', { type: 'number', validate: oasFormatValidator.double });
+  ajv.addFormat('int32', {
+    type: 'number',
+    validate: oasFormatValidator.int32,
+  });
+  ajv.addFormat('int64', {
+    type: 'number',
+    validate: oasFormatValidator.int64,
+  });
+  ajv.addFormat('float', {
+    type: 'number',
+    validate: oasFormatValidator.float,
+  });
+  ajv.addFormat('double', {
+    type: 'number',
+    validate: oasFormatValidator.double,
+  });
   ajv.addFormat('byte', { type: 'string', validate: oasFormatValidator.byte });
 
   ajvInstances[type] = ajv;
@@ -130,7 +142,7 @@ const cleanAJVErrorMessage = (message: string, path: Optional<string>, suggestio
 export const schema: IFunction<ISchemaOptions> = (targetVal, opts, paths) => {
   const results: IFunctionResult[] = [];
 
-  const path = paths.target || paths.given;
+  const path = paths.target ?? paths.given;
 
   if (targetVal === void 0)
     return [
@@ -149,24 +161,18 @@ export const schema: IFunction<ISchemaOptions> = (targetVal, opts, paths) => {
     if (!validator(targetVal) && validator.errors) {
       try {
         results.push(
-          ...(betterAjvErrors(schemaObj, targetVal, validator.errors, { format: 'js' }) as IAJVOutputError[]).map(
-            ({ suggestion, error, path: errorPath }) => ({
-              message: cleanAJVErrorMessage(error, errorPath, suggestion, typeof targetVal),
-              path: [...path, ...(errorPath ? errorPath.replace(/^\//, '').split('/') : [])],
-            }),
-          ),
+          ...(betterAjvErrors(schemaObj, targetVal, validator.errors, {
+            format: 'js',
+          }) as IAJVOutputError[]).map(({ suggestion, error, path: errorPath }) => ({
+            message: cleanAJVErrorMessage(error, errorPath, suggestion, typeof targetVal),
+            path: [...path, ...(errorPath ? errorPath.replace(/^\//, '').split('/') : [])],
+          })),
         );
       } catch {
         results.push(
           ...validator.errors.map(({ message, dataPath }) => ({
             message: message ? cleanAJVErrorMessage(message, dataPath, void 0, typeof targetVal) : '',
-            path: [
-              ...path,
-              ...dataPath
-                .split('/')
-                .slice(1)
-                .map(decodePointerFragment),
-            ],
+            path: [...path, ...dataPath.split('/').slice(1).map(decodePointerFragment)],
           })),
         );
       }

@@ -41,8 +41,9 @@
     "cli:debug": "node -r ts-node/register -r tsconfig-paths/register --inspect-brk src/cli/index.ts",
     "generate-assets": "node -r ts-node/register ./scripts/generate-assets.ts",
     "inline-version": "./scripts/inline-version.js",
+    "prelint": "tsc --noEmit",
     "lint.fix": "yarn lint --fix",
-    "lint": "tsc --noEmit && tslint 'src/**/*.ts'",
+    "lint": "eslint --cache --cache-location .cache/ src/**/*.{ts,js} test-harness/**/*.{ts,js}",
     "copy.html-templates": "copyfiles -u 1 \"./src/formatters/html/*.html\" \"./dist/\"",
     "postbuild.oas-functions": "copyfiles -u 1 \"dist/rulesets/oas*/functions/*.js\" ./",
     "postbuild": "yarn build.oas-functions && yarn generate-assets",
@@ -97,10 +98,14 @@
     "@types/text-table": "^0.2.1",
     "@types/tmp": "^0.1.0",
     "@types/xml2js": "^0.4.5",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
     "copyfiles": "^2.2.0",
     "dependency-graph": "^0.8.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "fetch-mock": "^7.7.3",
-    "glob-fs": "^0.1.7",
     "husky": "^4.2.3",
     "jest": "~25.2",
     "jest-mock": "^25.2.3",
@@ -113,6 +118,7 @@
     "nock": "~12.0.2",
     "node-html-parser": "^1.2.7",
     "pkg": "^4.4.5",
+    "prettier": "^2.0.2",
     "recast": "^0.18.5",
     "rimraf": "^3.0.2",
     "rollup": "^1.32.1",
@@ -123,16 +129,12 @@
     "ts-jest": "^25.0.0",
     "ts-node": "^8.8.1",
     "tsconfig-paths": "^3.9.0",
-    "tslint": "~5.20",
-    "tslint-config-stoplight": "~1.4",
     "typescript": "^3.8.3",
-    "typescript-json-schema": "~0.42.0",
     "xml2js": "^0.4.23"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
-      "tslint --fix",
-      "git add"
+      "eslint --fix --cache --cache-location .cache"
     ]
   },
   "husky": {

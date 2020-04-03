@@ -12,17 +12,23 @@ describe('example-value-or-externalValue', () => {
   });
 
   test('validate if just externalValue', async () => {
-    const results = await s.run({ components: { examples: { first: { externalValue: 'value' } } } });
+    const results = await s.run({
+      components: { examples: { first: { externalValue: 'value' } } },
+    });
     expect(results.length).toEqual(0);
   });
 
   test('validate if just value', async () => {
-    const results = await s.run({ components: { examples: { first: { value: 'value' } } } });
+    const results = await s.run({
+      components: { examples: { first: { value: 'value' } } },
+    });
     expect(results.length).toEqual(0);
   });
 
   test('validate if example on top level', async () => {
-    const results = await s.run({ examples: { first: { value: 'value', externalValue: 'value' } } });
+    const results = await s.run({
+      examples: { first: { value: 'value', externalValue: 'value' } },
+    });
     expect(results.length).toEqual(0);
   });
 
@@ -97,7 +103,13 @@ describe('example-value-or-externalValue', () => {
 
   test('multiple examples - return warnings if missing externalValue and value in one', async () => {
     const results = await s.run({
-      components: { examples: { first: { value: 'value1' }, second: { externalValue: 'external-value2' }, third: {} } },
+      components: {
+        examples: {
+          first: { value: 'value1' },
+          second: { externalValue: 'external-value2' },
+          third: {},
+        },
+      },
     });
     expect(results).toEqual([
       {
@@ -121,7 +133,9 @@ describe('example-value-or-externalValue', () => {
 
   test('return warnings if both externalValue and value', async () => {
     const results = await s.run({
-      components: { examples: { first: { externalValue: 'externalValue', value: 'value' } } },
+      components: {
+        examples: { first: { externalValue: 'externalValue', value: 'value' } },
+      },
     });
     expect(results).toEqual([
       {
@@ -252,7 +266,10 @@ describe('example-value-or-externalValue', () => {
                   'application/json': {
                     examples: {
                       first: { value: 'value1' },
-                      second: { externalValue: 'external-value2', value: 'value2' },
+                      second: {
+                        externalValue: 'external-value2',
+                        value: 'value2',
+                      },
                       third: { externalValue: 'external-value3' },
                     },
                   },

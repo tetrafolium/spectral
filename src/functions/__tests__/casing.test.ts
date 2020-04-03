@@ -227,7 +227,10 @@ describe('casing', () => {
         'with "%s" type - throws when allowLeadingSeparator option is used without specifying separator',
         type => {
           expect(() =>
-            runCasing('irrelevant value', CasingType[type], undefined, { char: undefined, allowLeading: true }),
+            runCasing('irrelevant value', CasingType[type], undefined, {
+              char: undefined,
+              allowLeading: true,
+            }),
           ).toThrow(AssertionError);
         },
       );
@@ -246,9 +249,11 @@ describe('casing', () => {
       test.each(invalidSepLengthCombinations)(
         'with type "%s" - throws when separator value is "%i" (not exactly one char long)',
         (type, len) => {
-          expect(() => runCasing('irrelevant value', CasingType[type], undefined, { char: '-'.repeat(len) })).toThrow(
-            AssertionError,
-          );
+          expect(() =>
+            runCasing('irrelevant value', CasingType[type], undefined, {
+              char: '-'.repeat(len),
+            }),
+          ).toThrow(AssertionError);
         },
       );
     });
@@ -306,7 +311,10 @@ describe('casing', () => {
     test('allows advanced scenarios', () => {
       expect(runCasing('X-MyAmazing-Header', CasingType.pascal, true, { char: '-' })).toBeUndefined();
       expect(
-        runCasing('/path/to/myResource', CasingType.camel, true, { char: '/', allowLeading: true }),
+        runCasing('/path/to/myResource', CasingType.camel, true, {
+          char: '/',
+          allowLeading: true,
+        }),
       ).toBeUndefined();
     });
   });

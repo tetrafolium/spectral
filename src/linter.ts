@@ -71,11 +71,11 @@ export const lintNode = (
 
     results.push(
       ...targetResults.map<IRuleResult>(result => {
-        const escapedJsonPath = (result.path || targetPath).map(segment => decodePointerFragment(String(segment)));
+        const escapedJsonPath = (result.path ?? targetPath).map(segment => decodePointerFragment(String(segment)));
         const associatedItem = inventory.findAssociatedItemForPath(escapedJsonPath, rule.resolved !== false);
-        const path = associatedItem?.path || getClosestJsonPath(inventory.resolved, escapedJsonPath);
-        const document = associatedItem?.document || inventory.document;
-        const range = document.getRangeForJsonPath(path, true) || Document.DEFAULT_RANGE;
+        const path = associatedItem?.path ?? getClosestJsonPath(inventory.resolved, escapedJsonPath);
+        const document = associatedItem?.document ?? inventory.document;
+        const range = document.getRangeForJsonPath(path, true) ?? Document.DEFAULT_RANGE;
         const value = path.length === 0 ? document.data : get(document.data, path);
         const source = associatedItem?.document.source;
 

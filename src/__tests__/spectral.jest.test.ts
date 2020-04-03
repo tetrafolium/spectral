@@ -75,9 +75,7 @@ describe('Spectral', () => {
         },
       };
 
-      nock('https://localhost:4000')
-        .get('/custom-ruleset')
-        .reply(200, JSON.stringify(ruleset));
+      nock('https://localhost:4000').get('/custom-ruleset').reply(200, JSON.stringify(ruleset));
 
       const s = new Spectral();
       await s.loadRuleset('https://localhost:4000/custom-ruleset');
@@ -302,7 +300,9 @@ describe('Spectral', () => {
       },
     });
 
-    const results = await s.run(fs.readFileSync(documentUri, 'utf8'), { resolve: { documentUri } });
+    const results = await s.run(fs.readFileSync(documentUri, 'utf8'), {
+      resolve: { documentUri },
+    });
 
     expect(results.length).toEqual(3);
 

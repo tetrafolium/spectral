@@ -463,18 +463,17 @@ describe('Linter service', () => {
         expect(output).toEqual(expect.arrayContaining([expect.objectContaining({ code: 'info-matches-stoplight' })]));
         expect(output).toEqual(
           expect.not.arrayContaining([
-            expect.objectContaining({ message: 'Info object should contain `contact` object' }),
+            expect.objectContaining({
+              message: 'Info object should contain `contact` object',
+            }),
           ]),
         );
       });
 
       it('given valid remote ruleset file, outputs no issues', () => {
-        nock('http://foo.local')
-          .persist()
-          .get('/ruleset.yaml')
-          .replyWithFile(200, validRulesetPath, {
-            'Content-Type': 'application/yaml',
-          });
+        nock('http://foo.local').persist().get('/ruleset.yaml').replyWithFile(200, validRulesetPath, {
+          'Content-Type': 'application/yaml',
+        });
 
         return expect(run(`lint ${validCustomOas3SpecPath} -r http://foo.local/ruleset.yaml`)).resolves.toEqual([]);
       });
@@ -503,21 +502,15 @@ describe('Linter service', () => {
 
   describe('when loading specification files from web', () => {
     it('outputs no issues', () => {
-      nock('http://foo.local')
-        .persist()
-        .get('/openapi')
-        .replyWithFile(200, validOas3SpecPath, {
-          'Content-Type': 'application/yaml',
-        });
+      nock('http://foo.local').persist().get('/openapi').replyWithFile(200, validOas3SpecPath, {
+        'Content-Type': 'application/yaml',
+      });
 
       return expect(run('lint http://foo.local/openapi')).resolves.toEqual([]);
     });
 
     it('throws if cannot load URI', () => {
-      nock('http://foo.local')
-        .persist()
-        .get('/openapi')
-        .reply(404);
+      nock('http://foo.local').persist().get('/openapi').reply(404);
 
       return expect(run('lint http://foo.local/openapi')).rejects.toThrow(
         'Could not parse http://foo.local/openapi: Not Found',
@@ -525,15 +518,16 @@ describe('Linter service', () => {
     });
 
     it('outputs warnings', () => {
-      nock('http://foo.local')
-        .persist()
-        .get('/openapi')
-        .replyWithFile(200, invalidOas3SpecPath, {
-          'Content-Type': 'application/yaml',
-        });
+      nock('http://foo.local').persist().get('/openapi').replyWithFile(200, invalidOas3SpecPath, {
+        'Content-Type': 'application/yaml',
+      });
 
       return expect(run('lint http://foo.local/openapi')).resolves.toEqual(
-        expect.arrayContaining([expect.objectContaining({ message: 'Info object should contain `contact` object.' })]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            message: 'Info object should contain `contact` object.',
+          }),
+        ]),
       );
     });
   });

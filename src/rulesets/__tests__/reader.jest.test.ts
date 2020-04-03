@@ -139,7 +139,9 @@ describe('Rulesets reader', () => {
           oasRules[name] = {
             ...rule,
             formats: expect.arrayContaining([expect.any(String)]),
-            ...((rule as IRule).severity === void 0 && { severity: DiagnosticSeverity.Warning }),
+            ...((rule as IRule).severity === void 0 && {
+              severity: DiagnosticSeverity.Warning,
+            }),
             then: expect.any(Object),
           };
 
@@ -164,7 +166,9 @@ describe('Rulesets reader', () => {
             rules[name] = {
               ...rule,
               formats: expect.arrayContaining([expect.any(String)]),
-              ...((rule as IRule).severity === undefined && { severity: DiagnosticSeverity.Warning }),
+              ...((rule as IRule).severity === undefined && {
+                severity: DiagnosticSeverity.Warning,
+              }),
               ...((rule as IRule).recommended === false && { severity: -1 }),
               then: expect.any(Object),
             };
@@ -203,7 +207,9 @@ describe('Rulesets reader', () => {
             const formattedRule: IRule = {
               ...rule,
               formats: expect.arrayContaining([expect.any(String)]),
-              ...((rule as IRule).severity === void 0 && { severity: DiagnosticSeverity.Warning }),
+              ...((rule as IRule).severity === void 0 && {
+                severity: DiagnosticSeverity.Warning,
+              }),
               ...((rule as IRule).recommended === false && { severity: -1 }),
               then: expect.any(Object),
             };
@@ -319,7 +325,9 @@ describe('Rulesets reader', () => {
         Object.entries(oasRuleset.rules).reduce<Dictionary<unknown>>((rules, [name, rule]) => {
           rules[name] = expect.objectContaining({
             description: (rule as IRule).description,
-            ...((rule as IRule).severity === undefined && { severity: DiagnosticSeverity.Warning }),
+            ...((rule as IRule).severity === undefined && {
+              severity: DiagnosticSeverity.Warning,
+            }),
           });
 
           return rules;
@@ -645,9 +653,7 @@ describe('Rulesets reader', () => {
   });
 
   it('should not fail if function cannot be loaded', () => {
-    nock('https://unpkg.com')
-      .get('/boo.js')
-      .reply(404);
+    nock('https://unpkg.com').get('/boo.js').reply(404);
 
     return expect(readRuleset(rulesetWithMissingFunctions)).resolves.toEqual({
       rules: {},
@@ -700,9 +706,7 @@ describe('Rulesets reader', () => {
   });
 
   it('given non-existent ruleset should output error', () => {
-    nock('https://unpkg.com')
-      .get('/oneParentRuleset')
-      .reply(404);
+    nock('https://unpkg.com').get('/oneParentRuleset').reply(404);
 
     return expect(readRuleset('oneParentRuleset')).rejects.toThrowError(
       'Could not parse https://unpkg.com/oneParentRuleset: Not Found',
@@ -710,10 +714,7 @@ describe('Rulesets reader', () => {
   });
 
   it('should reject if request is not finished within a specified timeout', () => {
-    nock('https://unpkg.com')
-      .get('/oneParentRuleset')
-      .delay(10000)
-      .reply(200);
+    nock('https://unpkg.com').get('/oneParentRuleset').delay(10000).reply(200);
 
     const ruleset = readRuleset('oneParentRuleset', { timeout: 100 });
 

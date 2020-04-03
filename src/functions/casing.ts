@@ -70,7 +70,9 @@ function assertValidOptions(opts: ICasingOptions): asserts opts is ICasingOption
   }
 
   if (opts.separator.char.length !== 1) {
-    throw new AssertionError({ message: "When valued, 'separator.char' should only be one character long." });
+    throw new AssertionError({
+      message: "When valued, 'separator.char' should only be one character long.",
+    });
   }
 }
 
