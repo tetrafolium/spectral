@@ -356,42 +356,69 @@ tags:
 
 **Recommended:** No
 
+### no-$ref-siblings
+
+Neither OpenAPI v2.0 or v3.0 allow things to go next to a $ref, because older versions of JSON Schema also do not allow things to go next to a ref. There are long complex stories about why which we won't get into here.
+
+Some tools explicitly or implicitly allow `$ref` siblings, and some do not allow them at all. When they are allowed the behavior is not always consistent, so it's best to avoid them entirely. Spectral will try and nudge users towards the correct behavior, but if your tooling relies on this undocumented quirk you can always disable it.
+
+<!-- theme:info -->
+> Comically `$ref` siblings are allowed in JSON Schema Draft 2019-09, and will be allowed in OpenAPI v3.1.0 Schema Objects, but there may be a few places in OpenAPI where they're not supported. Spectral will guide you through this maze as things develop.
+
+**Recommended:** Yes
+
+**Bad Example**
+
+```yaml
+ImagesData:
+    properties:
+      low_resolution:
+        $ref: '#/definitions/ImageInfo'
+        description: Image in low resolution
+      standard_resolution:
+        $ref: '#/definitions/ImageInfo'
+        description: Image in standard resolution
+```
+
+**Good Example**
+
+```yaml
+ImagesData:
+    properties:
+      low_resolution:
+        allOf:
+        - $ref: '#/definitions/ImageInfo'
+        - description: Image in low resolution
+      standard_resolution:
+        allOf:
+        - $ref: '#/definitions/ImageInfo'
+        - description: Image in standard resolution
+```
+
 ### typed-enum
 
 Enum values should respect the `type` specifier.
 
 **Recommended:** Yes
 
-**Good Example**
-
-```yaml
-TheGoodModel:
-  type: object
-  properties:
-    number_of_connectors:
-      type: integer
-      description: The number of extension points.
-      enum:
-        - 1
-        - 2
-        - 4
-        - 8
-```
-
 **Bad Example**
 
 ```yaml
-TheBadModel:
-  type: object
-  properties:
-    number_of_connectors:
-      type: integer
-      description: The number of extension points.
-      enum:
-        - 1
-        - 2
-        - 'a string!'
-        - 8
+type: integer
+enum:
+  - 1
+  - 'a string!'
+  - 3
+```
+
+**Good Example**
+
+```yaml
+type: integer
+enum:
+  - 1
+  - 2
+  - 3
 ```
 
 ## OpenAPI v2.0-only
