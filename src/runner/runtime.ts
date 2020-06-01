@@ -23,10 +23,9 @@ export class RunnerRuntime extends createEventEmitter<SpectralEvents>() {
     return proxy;
   }
 
-  public revoke() {
+  public revoke(): void {
     let revokable;
-    // tslint:disable-next-line:no-conditional-assignment
-    while ((revokable = this.revokables.shift())) {
+    while ((revokable = this.revokables.shift()) !== void 0) {
       revokable();
     }
   }
