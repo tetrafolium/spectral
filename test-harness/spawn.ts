@@ -14,15 +14,15 @@ export type SpawnReturn = {
 
 export type SpawnFn = (command: string, env: Optional<typeof process.env>) => Promise<SpawnReturn>;
 
-const createStream = () =>
+const createStream = (): Transform =>
   new Transform({
-    transform(chunk, encoding, done) {
+    transform(chunk, encoding, done): void {
       this.push(chunk);
       done();
     },
   });
 
-function stringifyStream(stream: Transform) {
+function stringifyStream(stream: Transform): Promise<string> {
   let result = '';
 
   stream.on('readable', () => {

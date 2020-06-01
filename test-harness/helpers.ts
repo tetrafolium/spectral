@@ -18,7 +18,7 @@ function getItem(input: string[], key: string): Optional<string>;
 function getItem(input: string[], key: string, required?: boolean): Optional<string> | string {
   const index = input.findIndex(t => t === key);
   if (index === -1 || index === input.length - 1) {
-    if (required) {
+    if (required === true) {
       throw new TypeError(`Expected "${key}" to be provided`);
     }
 
@@ -97,7 +97,7 @@ export function tmpFile(opts?: tmp.TmpNameOptions): Promise<tmp.FileResult> {
         ...opts,
       },
       (err, name, fd, removeCallback) => {
-        if (err) {
+        if (err !== null) {
           reject(err);
         } else {
           resolve({
@@ -113,7 +113,7 @@ export function tmpFile(opts?: tmp.TmpNameOptions): Promise<tmp.FileResult> {
 
 const BRACES = /{([^}]+)}/g;
 
-export const applyReplacements = (str: string, values: Dictionary<string>) => {
+export const applyReplacements = (str: string, values: Dictionary<string>): string => {
   const replacer = (match: string, identifier: string): string => {
     if (!(identifier in values)) {
       return match;

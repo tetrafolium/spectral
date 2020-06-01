@@ -1,6 +1,6 @@
 import { IFunction, IFunctionResult } from '../types';
 
-// eslint-disable-next-line no-shadow-restricted-names
+// eslint-disable-next-line no-shadow-restricted-names,no-undefined
 export const undefined: IFunction = (targetVal): void | IFunctionResult[] => {
   if (typeof targetVal !== 'undefined') {
     return [

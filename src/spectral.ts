@@ -71,7 +71,7 @@ export class Spectral {
       : isParsedResult(target)
       ? new ParsedDocument(target)
       : new Document<unknown, YamlParserResult<unknown>>(
-          typeof target === 'string' ? target : safeStringify(target, undefined, 2),
+          typeof target === 'string' ? target : safeStringify(target, void 0, 2),
           Parsers.Yaml,
           documentUri,
         );
@@ -151,7 +151,7 @@ export class Spectral {
     }
   }
 
-  private setExceptions(exceptions: RulesetExceptionCollection) {
+  private setExceptions(exceptions: RulesetExceptionCollection): void {
     const target: RulesetExceptionCollection = {};
     mergeExceptions(target, exceptions);
 
@@ -160,11 +160,11 @@ export class Spectral {
     Object.assign(this.exceptions, target);
   }
 
-  public async loadRuleset(uris: string[] | string, options?: IRulesetReadOptions) {
+  public async loadRuleset(uris: string[] | string, options?: IRulesetReadOptions): Promise<void> {
     this.setRuleset(await readRuleset(Array.isArray(uris) ? uris : [uris], options));
   }
 
-  public setRuleset(ruleset: IRuleset) {
+  public setRuleset(ruleset: IRuleset): void {
     this.runtime.revoke();
 
     this.setRules(ruleset.rules);
@@ -212,7 +212,7 @@ export class Spectral {
     this.setExceptions(ruleset.exceptions);
   }
 
-  public registerFormat(format: string, fn: FormatLookup) {
+  public registerFormat(format: string, fn: FormatLookup): void {
     this.formats[format] = fn;
   }
 

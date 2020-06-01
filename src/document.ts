@@ -59,7 +59,7 @@ export class Document<D = unknown, R extends IParserResult = IParserResult<D>> i
     };
   }
 
-  public get data() {
+  public get data(): D {
     return this.parserResult.data;
   }
 }
@@ -83,7 +83,7 @@ export class ParsedDocument<D = unknown, R extends IParsedResult = IParsedResult
     return this.parserResult.getLocationForJsonPath(this.parserResult.parsed, path, closest)?.range;
   }
 
-  public get data() {
+  public get data(): D {
     return this.parserResult.parsed.data;
   }
 }

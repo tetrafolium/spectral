@@ -35,7 +35,7 @@ describe('cli acceptance tests', () => {
         scenario.assets.map(async ([asset]) => {
           const ext = path.extname(asset);
           const tmpFileHandle = await tmpFile({
-            ...(ext && { postfix: ext }),
+            ...(ext.length > 0 ? { postfix: ext } : null),
           });
 
           tmpFileHandles.set(asset, tmpFileHandle);

@@ -56,7 +56,7 @@ const buildFrom = (basePattern: string, overrides: ICasingOptions): RegExp => {
 
   const pattern = basePattern.replace(/\{__DIGITS__\}/g, injectDigits ? DIGITS_PATTERN : '');
 
-  if (overrides.separator === undefined) {
+  if (overrides.separator === void 0) {
     return new RegExp(`^${pattern}$`);
   }
 
