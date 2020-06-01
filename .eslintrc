@@ -46,25 +46,26 @@
     ],
     "@typescript-eslint/no-var-requires": "warn",
     "@typescript-eslint/interface-name-prefix": "off",
-    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/require-await": "warn",
     "@typescript-eslint/explicit-function-return-type": "warn"
   },
   "overrides": [
+    {
+      "files": [
+        "**/*.js"
+      ],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/explicit-function-return-type": "off"
+      }
+    },
+
     {
       "files": [
         "scripts/**/*.{ts,js}"
       ],
       "env": {
         "node": true
-      }
-    },
-
-    {
-      "files": [
-        "scripts/**/*.js"
-      ],
-      "rules": {
-        "@typescript-eslint/no-var-requires": "off"
       }
     },
 
@@ -86,7 +87,9 @@
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "off",
         "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-var-requires": "off",
         "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/require-await": "off",
         "@typescript-eslint/unbound-method": "off"
       }
     },
@@ -116,15 +119,6 @@
       ],
       "env": {
         "node": true
-      }
-    },
-
-    {
-      "files": [
-        "test-harness/**/*.js"
-      ],
-      "rules": {
-        "@typescript-eslint/no-var-requires": "off"
       }
     }
   ]
