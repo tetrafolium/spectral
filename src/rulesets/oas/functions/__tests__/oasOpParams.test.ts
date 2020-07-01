@@ -1,6 +1,6 @@
-import { DiagnosticSeverity } from '@stoplight/types';
-import { RuleType, Spectral } from '../../../../index';
-import { rules } from '../../index.json';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {RuleType, Spectral} from '../../../../index';
+import {rules} from '../../index.json';
 import oasOpParams from '../oasOpParams';
 
 describe('oasOpParams', () => {
@@ -8,20 +8,20 @@ describe('oasOpParams', () => {
 
   beforeEach(() => {
     s = new Spectral();
-    s.setFunctions({ oasOpParams });
+    s.setFunctions({oasOpParams});
     s.setRules({
-      'operation-parameters': Object.assign(rules['operation-parameters'], {
-        recommended: true,
-        type: RuleType[rules['operation-parameters'].type],
+      'operation-parameters' : Object.assign(rules['operation-parameters'], {
+        recommended : true,
+        type : RuleType[rules['operation-parameters'].type],
       }),
     });
   });
 
   test('No error if no params', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {},
+      paths : {
+        '/foo' : {
+          get : {},
         },
       },
     });
@@ -30,10 +30,10 @@ describe('oasOpParams', () => {
 
   test('No error if only one param operation level', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [{ in: 'body', name: 'foo' }],
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [ {in : 'body', name : 'foo'} ],
           },
         },
       },
@@ -43,13 +43,13 @@ describe('oasOpParams', () => {
 
   test('No error if same param on different operations', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [{ in: 'body', name: 'foo' }],
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [ {in : 'body', name : 'foo'} ],
           },
-          put: {
-            parameters: [{ in: 'body', name: 'foo' }],
+          put : {
+            parameters : [ {in : 'body', name : 'foo'} ],
           },
         },
       },
@@ -59,33 +59,35 @@ describe('oasOpParams', () => {
 
   test('Error if non-unique param on same operation', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [
-              { in: 'query', name: 'foo' },
-              { in: 'query', name: 'foo' },
-              { in: 'query', name: 'foo' },
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [
+              {in : 'query', name : 'foo'},
+              {in : 'query', name : 'foo'},
+              {in : 'query', name : 'foo'},
             ],
           },
-          put: {},
+          put : {},
         },
       },
     });
     expect(results).toEqual([
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '1'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '1' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '2'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '2' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });
@@ -112,74 +114,78 @@ describe('oasOpParams', () => {
     });
     expect(results).toEqual([
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '1'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '1' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '2'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '2' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });
 
   test('Errors if multiple non-unique param on same operation', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [
-              { in: 'query', name: 'foo' },
-              { in: 'query', name: 'foo' },
-              { in: 'header', name: 'bar' },
-              { in: 'header', name: 'bar' },
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [
+              {in : 'query', name : 'foo'},
+              {in : 'query', name : 'foo'},
+              {in : 'header', name : 'bar'},
+              {in : 'header', name : 'bar'},
             ],
           },
-          put: {},
+          put : {},
         },
       },
     });
     expect(results).toEqual([
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '1'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '1' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
       {
-        code: 'operation-parameters',
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: ['paths', '/foo', 'get', 'parameters', '3'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '3' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });
 
   test('Error if multiple in:body', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [
-              { in: 'body', name: 'foo' },
-              { in: 'body', name: 'bar' },
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [
+              {in : 'body', name : 'foo'},
+              {in : 'body', name : 'bar'},
             ],
           },
-          put: {
-            parameters: [
-              { in: 'body', name: 'foo' },
-              { in: 'query', name: 'foo' },
-              { in: 'header', name: 'bar' },
-              { in: 'body', name: 'bar' },
-              { in: 'header', name: 'baz' },
-              { in: 'body', name: 'baz' },
+          put : {
+            parameters : [
+              {in : 'body', name : 'foo'},
+              {in : 'query', name : 'foo'},
+              {in : 'header', name : 'bar'},
+              {in : 'body', name : 'bar'},
+              {in : 'header', name : 'baz'},
+              {in : 'body', name : 'baz'},
             ],
           },
         },
@@ -187,37 +193,40 @@ describe('oasOpParams', () => {
     });
     expect(results).toEqual([
       {
-        code: 'operation-parameters',
-        message: 'Operation has already at least one instance of the `in:body` parameter.',
-        path: ['paths', '/foo', 'get', 'parameters', '1'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'Operation has already at least one instance of the `in:body` parameter.',
+        path : [ 'paths', '/foo', 'get', 'parameters', '1' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
       {
-        code: 'operation-parameters',
-        message: 'Operation has already at least one instance of the `in:body` parameter.',
-        path: ['paths', '/foo', 'put', 'parameters', '3'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'Operation has already at least one instance of the `in:body` parameter.',
+        path : [ 'paths', '/foo', 'put', 'parameters', '3' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
       {
-        code: 'operation-parameters',
-        message: 'Operation has already at least one instance of the `in:body` parameter.',
-        path: ['paths', '/foo', 'put', 'parameters', '5'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'Operation has already at least one instance of the `in:body` parameter.',
+        path : [ 'paths', '/foo', 'put', 'parameters', '5' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });
 
   test('Error if both in:formData and in:body', async () => {
     const results = await s.run({
-      paths: {
-        '/foo': {
-          get: {
-            parameters: [
-              { in: 'body', name: 'foo' },
-              { in: 'formData', name: 'bar' },
+      paths : {
+        '/foo' : {
+          get : {
+            parameters : [
+              {in : 'body', name : 'foo'},
+              {in : 'formData', name : 'bar'},
             ],
           },
         },
@@ -225,11 +234,12 @@ describe('oasOpParams', () => {
     });
     expect(results).toEqual([
       {
-        code: 'operation-parameters',
-        message: 'Operation cannot have both `in:body` and `in:formData` parameters.',
-        path: ['paths', '/foo', 'get', 'parameters'],
-        range: expect.any(Object),
-        severity: DiagnosticSeverity.Warning,
+        code : 'operation-parameters',
+        message :
+            'Operation cannot have both `in:body` and `in:formData` parameters.',
+        path : [ 'paths', '/foo', 'get', 'parameters' ],
+        range : expect.any(Object),
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });

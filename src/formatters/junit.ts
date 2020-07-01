@@ -23,12 +23,12 @@
  * @author Jamund Ferguson
  */
 
-import { extname } from '@stoplight/path';
-import { DiagnosticSeverity } from '@stoplight/types';
-import { escapeRegExp } from 'lodash';
-import { printPath, PrintStyle } from '../utils';
-import { Formatter } from './types';
-import { groupBySource, xmlEscape } from './utils';
+import {extname} from '@stoplight/path';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {escapeRegExp} from 'lodash';
+import {printPath, PrintStyle} from '../utils';
+import {Formatter} from './types';
+import {groupBySource, xmlEscape} from './utils';
 
 export const junit: Formatter = results => {
   let output = '';
@@ -39,22 +39,28 @@ export const junit: Formatter = results => {
   const groupedResults = groupBySource(results);
 
   for (const [source, validationResults] of Object.entries(groupedResults)) {
-    const classname = source.replace(new RegExp(`${escapeRegExp(extname(source))}$`), '');
+    const classname =
+        source.replace(new RegExp(`${escapeRegExp(extname(source))}$`), '');
 
     if (validationResults.length > 0) {
       const filteredValidationResults = validationResults.filter(
-        result => result.severity === DiagnosticSeverity.Error,
+          result => result.severity === DiagnosticSeverity.Error,
       );
 
-      output += `<testsuite package="org.spectral" time="0" tests="${filteredValidationResults.length}" errors="0" failures="${filteredValidationResults.length}" name="${source}">\n`;
+      output += `<testsuite package="org.spectral" time="0" tests="${
+          filteredValidationResults.length}" errors="0" failures="${
+          filteredValidationResults.length}" name="${source}">\n`;
 
       for (const result of filteredValidationResults) {
-        output += `<testcase time="0" name="org.spectral.${result.code ?? 'unknown'}" classname="${classname}">`;
+        output += `<testcase time="0" name="org.spectral.${
+            result.code ? ? 'unknown'}" classname="${classname}">`;
         output += `<failure message="${xmlEscape(result.message)}">`;
         output += '<![CDATA[';
-        output += `line ${result.range.start.line + 1}, col ${result.range.start.character + 1}, `;
+        output += `line ${result.range.start.line + 1}, col ${
+            result.range.start.character + 1}, `;
         output += `${xmlEscape(result.message)} (${result.code}) `;
-        output += `at path ${xmlEscape(printPath(result.path, PrintStyle.EscapedPointer))}`;
+        output += `at path ${
+            xmlEscape(printPath(result.path, PrintStyle.EscapedPointer))}`;
         output += ']]>';
         output += `</failure>`;
         output += '</testcase>\n';
@@ -62,8 +68,11 @@ export const junit: Formatter = results => {
 
       output += '</testsuite>\n';
     } else {
-      output += `<testsuite package="org.spectral" time="0" tests="1" errors="0" name="${source}">\n`;
-      output += `<testcase time="0" name="${source}" classname="${classname}" />\n`;
+      output +=
+          `<testsuite package="org.spectral" time="0" tests="1" errors="0" name="${
+              source}">\n`;
+      output +=
+          `<testcase time="0" name="${source}" classname="${classname}" />\n`;
       output += '</testsuite>\n';
     }
   }

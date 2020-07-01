@@ -1,21 +1,29 @@
-import { IResolveOpts, IResolveResult } from '@stoplight/json-ref-resolver/types';
-import { DiagnosticSeverity, Dictionary, IDiagnostic, JsonPath } from '@stoplight/types';
-import { JSONSchema4, JSONSchema6, JSONSchema7 } from 'json-schema';
-import { IFunction, IRule } from '.';
-import { Rule } from '../rule';
-import { ComputeFingerprintFunc } from '../utils';
+import {IResolveOpts, IResolveResult} from '@stoplight/json-ref-resolver/types';
+import {
+  DiagnosticSeverity,
+  Dictionary,
+  IDiagnostic,
+  JsonPath
+} from '@stoplight/types';
+import {JSONSchema4, JSONSchema6, JSONSchema7} from 'json-schema';
+
+import {Rule} from '../rule';
+import {ComputeFingerprintFunc} from '../utils';
+
+import {IFunction, IRule} from '.';
 
 export type FunctionCollection = Dictionary<IFunction<any>, string>;
 export type RuleCollection = Dictionary<IRule, string>;
 export type PartialRuleCollection = Dictionary<Partial<IRule>, string>;
 export type RunRuleCollection = Dictionary<Rule, string>;
 
-export type SpectralDiagnosticSeverity = DiagnosticSeverity | -1;
+export type SpectralDiagnosticSeverity = DiagnosticSeverity|- 1;
 
 /**
  * Name of the rule with a boolean value to enable or disable the rule.
  *
- * Will expand on this format later to allow for things like overriding rule options.
+ * Will expand on this format later to allow for things like overriding rule
+ * options.
  */
 export type RuleDeclarationCollection = Dictionary<boolean, string>;
 
@@ -28,9 +36,7 @@ export interface IConstructorOpts {
 
 export interface IRunOpts {
   ignoreUnknownFormat?: boolean;
-  resolve?: {
-    documentUri?: string;
-  };
+  resolve?: {documentUri?: string;};
 }
 
 export interface IRuleResult extends IDiagnostic {
@@ -56,4 +62,4 @@ export interface IResolver {
 export type FormatLookup = (document: unknown) => boolean;
 export type RegisteredFormats = Dictionary<FormatLookup, string>;
 
-export type JSONSchema = JSONSchema4 | JSONSchema6 | JSONSchema7;
+export type JSONSchema = JSONSchema4|JSONSchema6|JSONSchema7;

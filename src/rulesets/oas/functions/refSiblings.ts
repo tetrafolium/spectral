@@ -1,5 +1,5 @@
-import type { JsonPath } from '@stoplight/types';
-import type { IFunction, IFunctionResult } from '../../../types';
+import type {JsonPath} from '@stoplight/types';
+import type {IFunction, IFunctionResult} from '../../../types';
 
 function isObject(maybeObj: unknown): maybeObj is object {
   return typeof maybeObj === 'object' && maybeObj !== null;
@@ -23,32 +23,33 @@ function getParentValue(document: unknown, path: JsonPath): unknown {
   return piece;
 }
 
-const refSiblings: IFunction = (targetVal, opts, paths, { documentInventory }) => {
-  const value = getParentValue(documentInventory.unresolved, paths.given);
+const refSiblings: IFunction =
+    (targetVal, opts, paths, {documentInventory}) => {
+      const value = getParentValue(documentInventory.unresolved, paths.given);
 
-  if (!isObject(value)) {
-    return;
-  }
+      if (!isObject(value)) {
+        return;
+      }
 
-  const keys = Object.keys(value);
-  if (keys.length === 1) {
-    return;
-  }
+      const keys = Object.keys(value);
+      if (keys.length === 1) {
+        return;
+      }
 
-  const results: IFunctionResult[] = [];
-  const actualObjPath = paths.given.slice(0, -1);
+      const results: IFunctionResult[] = [];
+      const actualObjPath = paths.given.slice(0, -1);
 
-  for (const key of keys) {
-    if (key === '$ref') {
-      continue;
-    }
-    results.push({
-      message: '$ref cannot be placed next to any other properties',
-      path: [...actualObjPath, key],
-    });
-  }
+      for (const key of keys) {
+        if (key === '$ref') {
+          continue;
+        }
+        results.push({
+          message : '$ref cannot be placed next to any other properties',
+          path : [...actualObjPath, key ],
+        });
+      }
 
-  return results;
-};
+      return results;
+    };
 
 export default refSiblings;

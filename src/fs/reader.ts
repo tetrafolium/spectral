@@ -1,10 +1,11 @@
-import { isURL } from '@stoplight/path';
+import {isURL} from '@stoplight/path';
 import AbortController from 'abort-controller';
 import * as fs from 'fs';
-import { RequestInit } from 'node-fetch';
-import { STATIC_ASSETS } from '../assets';
+import {Agent} from 'http';
+import {RequestInit} from 'node-fetch';
+
+import {STATIC_ASSETS} from '../assets';
 import request from '../request';
-import { Agent } from 'http';
 
 export interface IReadOptions {
   encoding: string;
@@ -12,15 +13,16 @@ export interface IReadOptions {
   agent?: Agent;
 }
 
-export async function readFile(name: string | number, opts: IReadOptions): Promise<string> {
+export async function readFile(name: string|number,
+                               opts: IReadOptions): Promise<string> {
   if (typeof name === 'number') {
     let result = '';
 
-    const stream = fs.createReadStream('', { fd: name });
+    const stream = fs.createReadStream('', {fd : name});
     stream.setEncoding(opts.encoding);
 
     stream.on('readable', () => {
-      let chunk: string | null;
+      let chunk: string|null;
 
       while ((chunk = stream.read()) !== null) {
         result += chunk;
@@ -29,29 +31,26 @@ export async function readFile(name: string | number, opts: IReadOptions): Promi
 
     return new Promise<string>((resolve, reject) => {
       stream.on('error', reject);
-      stream.on('end', () => {
-        resolve(result);
-      });
+      stream.on('end', () => { resolve(result); });
     });
   } else if (name in STATIC_ASSETS) {
     return STATIC_ASSETS[name];
   } else if (isURL(name)) {
     let response;
-    let timeout: NodeJS.Timeout | number | null = null;
+    let timeout: NodeJS.Timeout|number|null = null;
     try {
       const requestOpts: RequestInit = {};
       requestOpts.agent = opts.agent;
       if (opts.timeout) {
         const controller = new AbortController();
-        timeout = setTimeout(() => {
-          controller.abort();
-        }, opts.timeout);
+        timeout = setTimeout(() => { controller.abort(); }, opts.timeout);
         requestOpts.signal = controller.signal;
       }
 
       response = await request(name, requestOpts);
 
-      if (!response.ok) throw new Error(response.statusText);
+      if (!response.ok)
+        throw new Error(response.statusText);
       return await response.text();
     } catch (ex) {
       if (ex.name === 'AbortError') {
@@ -81,7 +80,8 @@ export async function readFile(name: string | number, opts: IReadOptions): Promi
   }
 }
 
-export async function readParsable(name: string | number, opts: IReadOptions): Promise<string> {
+export async function readParsable(name: string|number,
+                                   opts: IReadOptions): Promise<string> {
   try {
     return await readFile(name, opts);
   } catch (ex) {

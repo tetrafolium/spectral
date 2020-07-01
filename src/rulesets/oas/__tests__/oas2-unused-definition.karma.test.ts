@@ -1,22 +1,24 @@
-import { DiagnosticSeverity } from '@stoplight/types';
-import { FetchMockSandbox } from 'fetch-mock';
-import { Document } from '../../../document';
-import { unreferencedReusableObject } from '../../../functions/unreferencedReusableObject';
-import { RuleType, Spectral } from '../../../index';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {FetchMockSandbox} from 'fetch-mock';
+import {Document} from '../../../document';
+import {
+  unreferencedReusableObject
+} from '../../../functions/unreferencedReusableObject';
+import {RuleType, Spectral} from '../../../index';
 import * as Parsers from '../../../parsers';
-import { httpAndFileResolver } from '../../../resolvers/http-and-file';
-import { rules } from '../index.json';
+import {httpAndFileResolver} from '../../../resolvers/http-and-file';
+import {rules} from '../index.json';
 
 describe('unusedDefinition - Http remote references', () => {
   let fetchMock: FetchMockSandbox;
 
-  const s = new Spectral({ resolver: httpAndFileResolver });
+  const s = new Spectral({resolver : httpAndFileResolver});
   s.registerFormat('oas2', () => true);
-  s.setFunctions({ unreferencedReusableObject });
+  s.setFunctions({unreferencedReusableObject});
   s.setRules({
-    'oas2-unused-definition': Object.assign(rules['oas2-unused-definition'], {
-      recommended: true,
-      type: RuleType[rules['oas2-unused-definition'].type],
+    'oas2-unused-definition' : Object.assign(rules['oas2-unused-definition'], {
+      recommended : true,
+      type : RuleType[rules['oas2-unused-definition'].type],
     }),
   });
 
@@ -25,17 +27,15 @@ describe('unusedDefinition - Http remote references', () => {
     window.fetch = fetchMock;
   });
 
-  afterEach(() => {
-    window.fetch = fetch;
-  });
+  afterEach(() => { window.fetch = fetch; });
 
   test('reports unreferenced definitions', async () => {
     fetchMock.mock('https://oas2.library.com/defs.json', {
-      status: 200,
-      body: {
-        definitions: {
-          ExternalHttp: {
-            type: 'number',
+      status : 200,
+      body : {
+        definitions : {
+          ExternalHttp : {
+            type : 'number',
           },
         },
       },
@@ -82,20 +82,20 @@ describe('unusedDefinition - Http remote references', () => {
 
     expect(results).toEqual([
       {
-        code: 'oas2-unused-definition',
-        message: 'Potentially unused definition has been detected.',
-        path: ['definitions', 'Unhooked'],
-        range: {
-          end: {
-            character: 9,
-            line: 33,
+        code : 'oas2-unused-definition',
+        message : 'Potentially unused definition has been detected.',
+        path : [ 'definitions', 'Unhooked' ],
+        range : {
+          end : {
+            character : 9,
+            line : 33,
           },
-          start: {
-            character: 20,
-            line: 31,
+          start : {
+            character : 20,
+            line : 31,
           },
         },
-        severity: DiagnosticSeverity.Warning,
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });

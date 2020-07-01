@@ -1,23 +1,26 @@
-import { DiagnosticSeverity } from '@stoplight/types';
-import { FetchMockSandbox } from 'fetch-mock';
-import { Document } from '../../../document';
-import { unreferencedReusableObject } from '../../../functions/unreferencedReusableObject';
-import { RuleType, Spectral } from '../../../index';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {FetchMockSandbox} from 'fetch-mock';
+import {Document} from '../../../document';
+import {
+  unreferencedReusableObject
+} from '../../../functions/unreferencedReusableObject';
+import {RuleType, Spectral} from '../../../index';
 import * as Parsers from '../../../parsers';
-import { httpAndFileResolver } from '../../../resolvers/http-and-file';
-import { rules } from '../index.json';
+import {httpAndFileResolver} from '../../../resolvers/http-and-file';
+import {rules} from '../index.json';
 
 describe('unusedComponentsSchema - Http remote references', () => {
   let fetchMock: FetchMockSandbox;
 
-  const s = new Spectral({ resolver: httpAndFileResolver });
+  const s = new Spectral({resolver : httpAndFileResolver});
   s.registerFormat('oas3', () => true);
-  s.setFunctions({ unreferencedReusableObject });
+  s.setFunctions({unreferencedReusableObject});
   s.setRules({
-    'oas3-unused-components-schema': Object.assign(rules['oas3-unused-components-schema'], {
-      recommended: true,
-      type: RuleType[rules['oas3-unused-components-schema'].type],
-    }),
+    'oas3-unused-components-schema' :
+        Object.assign(rules['oas3-unused-components-schema'], {
+          recommended : true,
+          type : RuleType[rules['oas3-unused-components-schema'].type],
+        }),
   });
 
   beforeEach(() => {
@@ -25,18 +28,16 @@ describe('unusedComponentsSchema - Http remote references', () => {
     window.fetch = fetchMock;
   });
 
-  afterEach(() => {
-    window.fetch = fetch;
-  });
+  afterEach(() => { window.fetch = fetch; });
 
   test('reports unreferenced components schemas', async () => {
     fetchMock.mock('https://oas3.library.com/defs.json', {
-      status: 200,
-      body: {
-        components: {
-          schemas: {
-            ExternalHttp: {
-              type: 'number',
+      status : 200,
+      body : {
+        components : {
+          schemas : {
+            ExternalHttp : {
+              type : 'number',
             },
           },
         },
@@ -86,20 +87,20 @@ describe('unusedComponentsSchema - Http remote references', () => {
 
     expect(results).toEqual([
       {
-        code: 'oas3-unused-components-schema',
-        message: 'Potentially unused components schema has been detected.',
-        path: ['components', 'schemas', 'Unhooked'],
-        range: {
-          end: {
-            character: 11,
-            line: 34,
+        code : 'oas3-unused-components-schema',
+        message : 'Potentially unused components schema has been detected.',
+        path : [ 'components', 'schemas', 'Unhooked' ],
+        range : {
+          end : {
+            character : 11,
+            line : 34,
           },
-          start: {
-            character: 22,
-            line: 32,
+          start : {
+            character : 22,
+            line : 32,
           },
         },
-        severity: DiagnosticSeverity.Warning,
+        severity : DiagnosticSeverity.Warning,
       },
     ]);
   });

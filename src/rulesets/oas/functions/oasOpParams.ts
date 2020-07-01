@@ -1,11 +1,11 @@
-import type { IFunction, IFunctionResult } from '../../../types';
-import type { Dictionary } from '@stoplight/types';
+import type {IFunction, IFunctionResult} from '../../../types';
+import type {Dictionary} from '@stoplight/types';
 
 function computeFingerprint(param: Dictionary<unknown>): string {
   return `${param.in}-${param.name}`;
 }
 
-export const oasOpParams: IFunction = (params, _opts, { given }) => {
+export const oasOpParams: IFunction = (params, _opts, {given}) => {
   /**
    * This function verifies:
    *
@@ -14,15 +14,17 @@ export const oasOpParams: IFunction = (params, _opts, { given }) => {
    * 3. Operation must have only one `in:body` parameter.
    */
 
-  if (!Array.isArray(params)) return;
+  if (!Array.isArray(params))
+    return;
 
-  if (params.length < 2) return;
+  if (params.length < 2)
+    return;
 
   const results: IFunctionResult[] = [];
 
   const count: Dictionary<number[]> = {
-    body: [],
-    formData: [],
+    body : [],
+    formData : [],
   };
   const list: string[] = [];
   const duplicates: number[] = [];
@@ -32,10 +34,12 @@ export const oasOpParams: IFunction = (params, _opts, { given }) => {
   for (const param of params) {
     index++;
 
-    if (param === null || typeof param !== 'object') continue;
+    if (param === null || typeof param !== 'object')
+      continue;
 
     // skip params that are refs
-    if ('$ref' in param) continue;
+    if ('$ref' in param)
+      continue;
 
     // Operations must have unique `name` + `in` parameters.
     const fingerprint = computeFingerprint(param);
@@ -53,23 +57,26 @@ export const oasOpParams: IFunction = (params, _opts, { given }) => {
   if (duplicates.length > 0) {
     for (const i of duplicates) {
       results.push({
-        message: 'A parameter in this operation already exposes the same combination of `name` and `in` values.',
-        path: [...given, i],
+        message :
+            'A parameter in this operation already exposes the same combination of `name` and `in` values.',
+        path : [...given, i ],
       });
     }
   }
 
   if (count.body.length > 0 && count.formData.length > 0) {
     results.push({
-      message: 'Operation cannot have both `in:body` and `in:formData` parameters.',
+      message :
+          'Operation cannot have both `in:body` and `in:formData` parameters.',
     });
   }
 
   if (count.body.length > 1) {
     for (let i = 1; i < count.body.length; i++) {
       results.push({
-        message: 'Operation has already at least one instance of the `in:body` parameter.',
-        path: [...given, count.body[i]],
+        message :
+            'Operation has already at least one instance of the `in:body` parameter.',
+        path : [...given, count.body[i] ],
       });
     }
   }

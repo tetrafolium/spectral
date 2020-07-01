@@ -1,8 +1,12 @@
-import { extractPointerFromRef, extractSourceFromRef, pointerToPath } from '@stoplight/json';
-import { Dictionary, JsonPath } from '@stoplight/types';
-import { InvalidUriError } from '../../rulesets/mergers/exceptions';
-import { RunRuleCollection } from '../../types';
-import { RulesetExceptionCollection } from '../../types/ruleset';
+import {
+  extractPointerFromRef,
+  extractSourceFromRef,
+  pointerToPath
+} from '@stoplight/json';
+import {Dictionary, JsonPath} from '@stoplight/types';
+import {InvalidUriError} from '../../rulesets/mergers/exceptions';
+import {RunRuleCollection} from '../../types';
+import {RulesetExceptionCollection} from '../../types/ruleset';
 
 export interface IExceptionLocation {
   source: string;
@@ -10,12 +14,12 @@ export interface IExceptionLocation {
 }
 
 export const pivotExceptions = (
-  exceptions: RulesetExceptionCollection,
-  runRules: RunRuleCollection,
-): Dictionary<IExceptionLocation[], string> => {
+    exceptions: RulesetExceptionCollection,
+    runRules: RunRuleCollection,
+    ): Dictionary<IExceptionLocation[], string> => {
   const dic: Dictionary<IExceptionLocation[], string> = {};
 
-  Object.entries(exceptions).forEach(([location, rules]) => {
+  Object.entries(exceptions).forEach(([ location, rules ]) => {
     const pointer = extractPointerFromRef(location);
     const source = extractSourceFromRef(location);
 
@@ -31,7 +35,7 @@ export const pivotExceptions = (
           dic[rulename] = [];
         }
 
-        dic[rulename].push({ source, path: pointerToPath(pointer) });
+        dic[rulename].push({source, path : pointerToPath(pointer)});
       }
     });
   });

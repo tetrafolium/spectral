@@ -1,9 +1,10 @@
-import type { IFunction, IFunctionResult } from '../../../types';
+import type {IFunction, IFunctionResult} from '../../../types';
 
-export const oasOpIdUnique: IFunction = (targetVal, _options, functionPaths) => {
+export const oasOpIdUnique: IFunction = (targetVal, _options,
+                                         functionPaths) => {
   const results: IFunctionResult[] = [];
 
-  const { paths = {} } = targetVal;
+  const {paths = {}} = targetVal;
 
   const ids: any[] = [];
 
@@ -11,11 +12,11 @@ export const oasOpIdUnique: IFunction = (targetVal, _options, functionPaths) => 
     if (Object.keys(paths[path]).length > 0) {
       for (const operation in paths[path]) {
         if (operation !== 'parameters') {
-          const { operationId } = paths[path][operation];
+          const {operationId} = paths[path][operation];
 
           if (operationId) {
             ids.push({
-              path: ['paths', path, operation, 'operationId'],
+              path : [ 'paths', path, operation, 'operationId' ],
               operationId,
             });
           }
@@ -25,10 +26,11 @@ export const oasOpIdUnique: IFunction = (targetVal, _options, functionPaths) => 
   }
 
   ids.forEach(operationId => {
-    if (ids.filter(id => id.operationId === operationId.operationId).length > 1) {
+    if (ids.filter(id => id.operationId === operationId.operationId).length >
+        1) {
       results.push({
-        message: 'operationId must be unique',
-        path: operationId.path || functionPaths.given,
+        message : 'operationId must be unique',
+        path : operationId.path || functionPaths.given,
       });
     }
   });

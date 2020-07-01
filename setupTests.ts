@@ -1,12 +1,11 @@
-import { RulesetExceptionCollection } from './src/types/ruleset';
-
-import { IRule, isAsyncApiv2, Rule, RuleCollection, Spectral } from './src';
-import { rules as asyncApiRules } from './src/rulesets/asyncapi/index.json';
+import {IRule, isAsyncApiv2, Rule, RuleCollection, Spectral} from './src';
+import {rules as asyncApiRules} from './src/rulesets/asyncapi/index.json';
+import {RulesetExceptionCollection} from './src/types/ruleset';
 
 export const buildRulesetExceptionCollectionFrom = (
-  loc: string,
-  rules: string[] = ['a'],
-): RulesetExceptionCollection => {
+    loc: string,
+    rules: string[] = [ 'a' ],
+    ): RulesetExceptionCollection => {
   const source = {};
   source[loc] = rules;
   return source;
@@ -20,8 +19,8 @@ const removeAllRulesBut = (spectral: Spectral, ruleName: string) => {
   const rawRule = asyncApiRules[ruleName];
 
   const patchedRule = Object.assign(rule1, {
-    recommended: true,
-    severity: rawRule.severity,
+    recommended : true,
+    severity : rawRule.severity,
   }) as IRule;
 
   const rules: RuleCollection = {};
@@ -29,13 +28,14 @@ const removeAllRulesBut = (spectral: Spectral, ruleName: string) => {
   spectral.setRules(rules);
 };
 
-export const buildTestSpectralWithAsyncApiRule = async (ruleName: string): Promise<[Spectral, Rule]> => {
+export const buildTestSpectralWithAsyncApiRule =
+    async(ruleName: string): Promise<[ Spectral, Rule ]> => {
   const s = new Spectral();
   s.registerFormat('asyncapi2', isAsyncApiv2);
   await s.loadRuleset('spectral:asyncapi');
 
   removeAllRulesBut(s, ruleName);
-  expect(Object.keys(s.rules)).toEqual([ruleName]);
+  expect(Object.keys(s.rules)).toEqual([ ruleName ]);
 
   const rule = s.rules[ruleName];
   expect(rule.enabled).not.toBe(false);
@@ -44,5 +44,5 @@ export const buildTestSpectralWithAsyncApiRule = async (ruleName: string): Promi
   expect(rule.formats).not.toBeUndefined();
   expect(rule.formats).toContain('asyncapi2');
 
-  return [s, rule];
+  return [ s, rule ];
 };

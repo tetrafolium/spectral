@@ -1,27 +1,27 @@
-import { Spectral } from '../../../spectral';
+import {Spectral} from '../../../spectral';
 import oasOp2xxResponse from '../functions/oasOp2xxResponse';
-import { rules } from '../index.json';
+import {rules} from '../index.json';
 
 describe('operation-2xx-response', () => {
   let spectral: Spectral;
 
   beforeEach(() => {
     spectral = new Spectral();
-    spectral.setFunctions({ oasOp2xxResponse });
+    spectral.setFunctions({oasOp2xxResponse});
     spectral.setRules({
       // @ts-ignore
-      'operation-2xx-response': rules['operation-2xx-response'],
+      'operation-2xx-response' : rules['operation-2xx-response'],
     });
   });
 
   test('is happy when a 200 response is set', async () => {
     const results = await spectral.run({
-      swagger: '2.0',
-      paths: {
-        '/path': {
-          get: {
-            responses: {
-              '200': {},
+      swagger : '2.0',
+      paths : {
+        '/path' : {
+          get : {
+            responses : {
+              '200' : {},
             },
           },
         },
@@ -33,12 +33,12 @@ describe('operation-2xx-response', () => {
 
   test('is happy when a (non 200) 2xx response is set', async () => {
     const results = await spectral.run({
-      swagger: '2.0',
-      paths: {
-        '/path': {
-          get: {
-            responses: {
-              '204': {},
+      swagger : '2.0',
+      paths : {
+        '/path' : {
+          get : {
+            responses : {
+              '204' : {},
             },
           },
         },
@@ -48,38 +48,40 @@ describe('operation-2xx-response', () => {
     expect(results).toHaveLength(0);
   });
 
-  ['put', 'post', 'delete', 'options', 'head', 'patch', 'trace'].forEach(method => {
-    test(`warns if HTTP verb ${method} is missing a 2xx response`, async () => {
-      const obj = {
-        swagger: '2.0',
-        paths: {
-          '/path': {},
-        },
-      };
-      obj.paths['/path'][method] = {
-        responses: {
-          '418': {},
-        },
-      };
-      const results = await spectral.run(obj);
-      expect(results).toEqual([
-        expect.objectContaining({
-          code: 'operation-2xx-response',
-          message: 'Operation must have at least one `2xx` response.',
-          path: ['paths', '/path', method, 'responses'],
-        }),
-      ]);
-    });
-  });
+  ['put', 'post', 'delete', 'options', 'head', 'patch', 'trace'].forEach(
+      method => {
+        test(`warns if HTTP verb ${method} is missing a 2xx response`,
+             async () => {
+               const obj = {
+                 swagger : '2.0',
+                 paths : {
+                   '/path' : {},
+                 },
+               };
+               obj.paths['/path'][method] = {
+                 responses : {
+                   '418' : {},
+                 },
+               };
+               const results = await spectral.run(obj);
+               expect(results).toEqual([
+                 expect.objectContaining({
+                   code : 'operation-2xx-response',
+                   message : 'Operation must have at least one `2xx` response.',
+                   path : [ 'paths', '/path', method, 'responses' ],
+                 }),
+               ]);
+             });
+      });
 
   test('warns about missing 2xx response', async () => {
     const results = await spectral.run({
-      swagger: '2.0',
-      paths: {
-        '/path': {
-          get: {
-            responses: {
-              400: {},
+      swagger : '2.0',
+      paths : {
+        '/path' : {
+          get : {
+            responses : {
+              400 : {},
             },
           },
         },
@@ -88,22 +90,23 @@ describe('operation-2xx-response', () => {
 
     expect(results).toEqual([
       expect.objectContaining({
-        code: 'operation-2xx-response',
-        message: 'Operation must have at least one `2xx` response.',
-        path: ['paths', '/path', 'get', 'responses'],
+        code : 'operation-2xx-response',
+        message : 'Operation must have at least one `2xx` response.',
+        path : [ 'paths', '/path', 'get', 'responses' ],
       }),
     ]);
   });
 
-  test('ignores anything at the PathItem level which is not a HTTP method', async () => {
-    const results = await spectral.run({
-      swagger: '2.0',
-      paths: {
-        '/path': {
-          'x-summary': 'why is this here',
-        },
-      },
-    });
-    expect(results).toEqual([]);
-  });
+  test('ignores anything at the PathItem level which is not a HTTP method',
+       async () => {
+         const results = await spectral.run({
+           swagger : '2.0',
+           paths : {
+             '/path' : {
+               'x-summary' : 'why is this here',
+             },
+           },
+         });
+         expect(results).toEqual([]);
+       });
 });

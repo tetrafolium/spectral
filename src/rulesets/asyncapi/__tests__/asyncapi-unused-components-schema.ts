@@ -1,8 +1,8 @@
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
 
-import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
-import { Rule } from '../../../rule';
-import { Spectral } from '../../../spectral';
+import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
+import {Rule} from '../../../rule';
+import {Spectral} from '../../../spectral';
 
 const ruleName = 'asyncapi-unused-components-schema';
 let s: Spectral;
@@ -14,57 +14,59 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi: '2.0.0',
-    channels: {
-      'users/signedUp': {
-        subscribe: {
-          message: {
-            payload: {
-              $ref: '#/components/schemas/externallyDefinedUser',
+    asyncapi : '2.0.0',
+    channels : {
+      'users/signedUp' : {
+        subscribe : {
+          message : {
+            payload : {
+              $ref : '#/components/schemas/externallyDefinedUser',
             },
           },
         },
       },
     },
-    components: {
-      schemas: {
-        externallyDefinedUser: {
-          type: 'string',
+    components : {
+      schemas : {
+        externallyDefinedUser : {
+          type : 'string',
         },
       },
     },
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, { ignoreUnknownFormat: false });
+    const results = await s.run(doc, {ignoreUnknownFormat : false});
 
     expect(results).toEqual([]);
   });
 
-  test('return result if components.schemas contains unreferenced objects', async () => {
-    const clone = cloneDeep(doc);
+  test(
+      'return result if components.schemas contains unreferenced objects',
+      async () => {
+        const clone = cloneDeep(doc);
 
-    delete clone.channels['users/signedUp'];
+        delete clone.channels['users/signedUp'];
 
-    clone.channels['users/signedOut'] = {
-      subscribe: {
-        message: {
-          payload: {
-            type: 'string',
+        clone.channels['users/signedOut'] = {
+          subscribe : {
+            message : {
+              payload : {
+                type : 'string',
+              },
+            },
           },
-        },
-      },
-    };
+        };
 
-    const results = await s.run(clone, { ignoreUnknownFormat: false });
+        const results = await s.run(clone, {ignoreUnknownFormat : false});
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: ruleName,
-        message: 'Potentially unused components schema has been detected.',
-        path: ['components', 'schemas', 'externallyDefinedUser'],
-        severity: rule.severity,
-      }),
-    ]);
-  });
+        expect(results).toEqual([
+          expect.objectContaining({
+            code : ruleName,
+            message : 'Potentially unused components schema has been detected.',
+            path : [ 'components', 'schemas', 'externallyDefinedUser' ],
+            severity : rule.severity,
+          }),
+        ]);
+      });
 });

@@ -1,73 +1,79 @@
-import { DiagnosticSeverity, Optional } from '@stoplight/types';
-import { JSONPath, JSONPathCallback } from 'jsonpath-plus';
-import { flatMap, isObject } from 'lodash';
-import { JSONPathExpression, traverse } from 'nimma';
+import {DiagnosticSeverity, Optional} from '@stoplight/types';
+import {JSONPath, JSONPathCallback} from 'jsonpath-plus';
+import {flatMap, isObject} from 'lodash';
+import {JSONPathExpression, traverse} from 'nimma';
 
-import { IDocument, STDIN } from '../document';
-import { DocumentInventory } from '../documentInventory';
-import { OptimizedRule, Rule } from '../rule';
-import { IGivenNode, IRuleResult } from '../types';
-import { ComputeFingerprintFunc, prepareResults } from '../utils';
-import { generateDocumentWideResult } from '../utils/generateDocumentWideResult';
-import { lintNode } from './lintNode';
-import { RunnerRuntime } from './runtime';
-import { IRunnerInternalContext, IRunnerPublicContext } from './types';
-import { IExceptionLocation, pivotExceptions } from './utils';
+import {IDocument, STDIN} from '../document';
+import {DocumentInventory} from '../documentInventory';
+import {OptimizedRule, Rule} from '../rule';
+import {IGivenNode, IRuleResult} from '../types';
+import {ComputeFingerprintFunc, prepareResults} from '../utils';
+import {generateDocumentWideResult} from '../utils/generateDocumentWideResult';
+import {lintNode} from './lintNode';
+import {RunnerRuntime} from './runtime';
+import {IRunnerInternalContext, IRunnerPublicContext} from './types';
+import {IExceptionLocation, pivotExceptions} from './utils';
 
-const isStdInSource = (inventory: DocumentInventory): boolean => {
-  return inventory.document.source === STDIN;
-};
+const isStdInSource = (inventory: DocumentInventory):
+    boolean => { return inventory.document.source === STDIN; };
 
-const generateDefinedExceptionsButStdIn = (documentInventory: DocumentInventory): IRuleResult => {
+const generateDefinedExceptionsButStdIn = (documentInventory:
+                                               DocumentInventory): IRuleResult => {
   return generateDocumentWideResult(
-    documentInventory.document,
-    'The ruleset contains `except` entries. However, they cannot be enforced when the input is passed through stdin.',
-    DiagnosticSeverity.Warning,
-    'except-but-stdin',
+      documentInventory.document,
+      'The ruleset contains `except` entries. However, they cannot be enforced when the input is passed through stdin.',
+      DiagnosticSeverity.Warning,
+      'except-but-stdin',
   );
 };
 
 const runRule = (
-  context: IRunnerInternalContext,
-  rule: Rule,
-  exceptRuleByLocations: Optional<IExceptionLocation[]>,
-): void => {
-  const target = rule.resolved ? context.documentInventory.resolved : context.documentInventory.unresolved;
+    context: IRunnerInternalContext,
+    rule: Rule,
+    exceptRuleByLocations: Optional<IExceptionLocation[]>,
+    ): void => {
+  const target = rule.resolved ? context.documentInventory.resolved
+                               : context.documentInventory.unresolved;
 
   if (!isObject(target)) {
     return;
   }
 
   for (const given of rule.given) {
-    // don't have to spend time running jsonpath if given is $ - can just use the root object
+    // don't have to spend time running jsonpath if given is $ - can just use
+    // the root object
     if (given === '$') {
       lintNode(
-        context,
-        {
-          path: ['$'],
-          value: target,
-        },
-        rule,
-        exceptRuleByLocations,
+          context,
+          {
+            path : [ '$' ],
+            value : target,
+          },
+          rule,
+          exceptRuleByLocations,
       );
     } else {
       JSONPath({
-        path: given,
-        json: target,
-        resultType: 'all',
-        callback: (result => {
-          lintNode(
-            context,
-            {
-              // @ts-expect-error
-              // this is needed due to broken typings in jsonpath-plus (JSONPathClass.toPathArray is correct from typings point of view, but JSONPathClass is not exported, so it fails at runtime)
-              path: JSONPath.toPathArray(result.path),
-              value: result.value,
-            },
-            rule,
-            exceptRuleByLocations,
-          );
-        }) as JSONPathCallback,
+        path : given,
+        json : target,
+        resultType : 'all',
+        callback :
+            (result => {
+              lintNode(
+                  context,
+                  {
+                    // @ts-expect-error
+                    // this is needed due to broken typings in jsonpath-plus
+                    // (JSONPathClass.toPathArray is correct from typings point
+                    // of view, but JSONPathClass is not exported, so it fails
+                    // at runtime)
+                    path : JSONPath.toPathArray(result.path),
+                    value : result.value,
+                  },
+                  rule,
+                  exceptRuleByLocations,
+              );
+            }) as JSONPathCallback,
       });
     }
   }
@@ -76,41 +82,40 @@ const runRule = (
 export class Runner {
   public readonly results: IRuleResult[];
 
-  constructor(protected readonly runtime: RunnerRuntime, protected readonly inventory: DocumentInventory) {
+  constructor(protected readonly runtime: RunnerRuntime,
+              protected readonly inventory: DocumentInventory) {
     this.results = [...this.inventory.diagnostics, ...this.document.diagnostics, ...(this.inventory.errors ?? [])];
   }
 
-  protected get document(): IDocument {
-    return this.inventory.document;
-  }
+  protected get document(): IDocument { return this.inventory.document; }
 
-  public addResult(result: IRuleResult): void {
-    this.results.push(result);
-  }
+  public addResult(result: IRuleResult): void { this.results.push(result); }
 
   public async run(context: IRunnerPublicContext): Promise<void> {
     this.runtime.emit('setup');
 
-    const { inventory: documentInventory } = this;
+    const {inventory : documentInventory} = this;
 
-    const { rules, exceptions } = context;
+    const {rules, exceptions} = context;
 
     const runnerContext: IRunnerInternalContext = {
       ...context,
       documentInventory,
-      results: this.results,
-      promises: [],
+      results : this.results,
+      promises : [],
     };
 
     const isStdIn = isStdInSource(documentInventory);
-    const exceptRuleByLocations = isStdIn ? {} : pivotExceptions(exceptions, rules);
+    const exceptRuleByLocations =
+        isStdIn ? {} : pivotExceptions(exceptions, rules);
 
     if (isStdIn && Object.keys(exceptions).length > 0) {
-      runnerContext.results.push(generateDefinedExceptionsButStdIn(documentInventory));
+      runnerContext.results.push(
+          generateDefinedExceptionsButStdIn(documentInventory));
     }
 
     const relevantRules = Object.values(rules).filter(
-      rule => rule.enabled && rule.matchesFormat(documentInventory.formats),
+        rule => rule.enabled && rule.matchesFormat(documentInventory.formats),
     );
 
     const optimizedRules: OptimizedRule[] = [];
@@ -137,11 +142,13 @@ export class Runner {
     }
 
     if (optimizedRules.length > 0) {
-      traverse(Object(runnerContext.documentInventory.resolved), flatMap(optimizedRules, pickExpressions));
+      traverse(Object(runnerContext.documentInventory.resolved),
+               flatMap(optimizedRules, pickExpressions));
     }
 
     if (optimizedUnresolvedRules.length > 0) {
-      traverse(Object(runnerContext.documentInventory.unresolved), flatMap(optimizedUnresolvedRules, pickExpressions));
+      traverse(Object(runnerContext.documentInventory.unresolved),
+               flatMap(optimizedUnresolvedRules, pickExpressions));
     }
 
     for (const rule of unoptimizedRules) {
@@ -168,6 +175,6 @@ export class Runner {
   }
 }
 
-function pickExpressions({ expressions }: OptimizedRule): JSONPathExpression[] {
+function pickExpressions({expressions}: OptimizedRule): JSONPathExpression[] {
   return expressions;
 }

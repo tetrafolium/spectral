@@ -1,33 +1,30 @@
-import { RunnerRuntime } from '../runtime';
+import {RunnerRuntime} from '../runtime';
 
 describe('Runner Runtime', () => {
   let runtime: RunnerRuntime;
 
-  beforeEach(() => {
-    runtime = new RunnerRuntime();
-  });
+  beforeEach(() => { runtime = new RunnerRuntime(); });
 
   describe('spawn', () => {
-    it('always create a new sub-instance', () => {
-      expect(runtime.spawn()).not.toBe(runtime.spawn());
-    });
+    it('always create a new sub-instance',
+       () => { expect(runtime.spawn()).not.toBe(runtime.spawn()); });
 
     it('freezes a created sub-instance', () => {
       const instance = runtime.spawn();
-      const { on } = instance;
+      const {on} = instance;
 
       expect(() => void delete instance.on).toThrow();
       expect(() => void (instance.on = jest.fn())).toThrow();
       // @ts-expect-error
       expect(() => void (instance.off = true)).toThrow();
 
-      expect(instance).toStrictEqual({ on });
+      expect(instance).toStrictEqual({on});
     });
   });
 
   describe('revoke', () => {
     it('revokes all registered sub-instances', () => {
-      const instances = [runtime.spawn(), runtime.spawn(), runtime.spawn()];
+      const instances = [ runtime.spawn(), runtime.spawn(), runtime.spawn() ];
 
       runtime.revoke();
 

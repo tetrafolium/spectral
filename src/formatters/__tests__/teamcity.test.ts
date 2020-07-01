@@ -1,13 +1,13 @@
-import { sortResults } from '../../utils';
-import { teamcity } from '../teamcity';
+import {sortResults} from '../../utils';
+import {teamcity} from '../teamcity';
 
 const mixedErrors = sortResults(require('./__fixtures__/mixed-errors.json'));
 
 describe('Teamcity formatter', () => {
   test('should format messages', () => {
     const result = teamcity(mixedErrors);
-    expect(result)
-      .toContain(`##teamcity[inspectionType category='openapi' id='info-contact' name='info-contact' description='hint -- Info object should contain \`contact\` object.']
+    expect(result).toContain(
+        `##teamcity[inspectionType category='openapi' id='info-contact' name='info-contact' description='hint -- Info object should contain \`contact\` object.']
 ##teamcity[inspection typeId='info-contact' file='/home/Stoplight/spectral/src/__tests__/__fixtures__/petstore.oas3.json' line='3' message='hint -- Info object should contain \`contact\` object.']
 ##teamcity[inspectionType category='openapi' id='info-description' name='info-description' description='warning -- OpenAPI object info \`description\` must be present and non-empty string.']
 ##teamcity[inspection typeId='info-description' file='/home/Stoplight/spectral/src/__tests__/__fixtures__/petstore.oas3.json' line='3' message='warning -- OpenAPI object info \`description\` must be present and non-empty string.']

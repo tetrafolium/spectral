@@ -1,8 +1,8 @@
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
 
-import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
-import { Rule } from '../../../rule';
-import { Spectral } from '../../../spectral';
+import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
+import {Rule} from '../../../rule';
+import {Spectral} from '../../../spectral';
 
 const ruleName = 'asyncapi-info-contact-properties';
 let s: Spectral;
@@ -14,36 +14,38 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi: '2.0.0',
-    info: {
-      contact: {
-        name: 'stoplight',
-        url: 'stoplight.io',
-        email: 'support@stoplight.io',
+    asyncapi : '2.0.0',
+    info : {
+      contact : {
+        name : 'stoplight',
+        url : 'stoplight.io',
+        email : 'support@stoplight.io',
       },
     },
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, { ignoreUnknownFormat: false });
+    const results = await s.run(doc, {ignoreUnknownFormat : false});
 
     expect(results).toEqual([]);
   });
 
-  test.each(['name', 'url', 'email'])('return result if contact.%s property is missing', async (property: string) => {
-    const clone = cloneDeep(doc);
+  test.each([ 'name', 'url', 'email' ])(
+      'return result if contact.%s property is missing',
+      async (property: string) => {
+        const clone = cloneDeep(doc);
 
-    delete clone.info.contact[property];
+        delete clone.info.contact[property];
 
-    const results = await s.run(clone, { ignoreUnknownFormat: false });
+        const results = await s.run(clone, {ignoreUnknownFormat : false});
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: ruleName,
-        message: 'Contact object should have `name`, `url` and `email`.',
-        path: ['info', 'contact'],
-        severity: rule.severity,
-      }),
-    ]);
-  });
+        expect(results).toEqual([
+          expect.objectContaining({
+            code : ruleName,
+            message : 'Contact object should have `name`, `url` and `email`.',
+            path : [ 'info', 'contact' ],
+            severity : rule.severity,
+          }),
+        ]);
+      });
 });

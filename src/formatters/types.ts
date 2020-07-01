@@ -1,3 +1,3 @@
-import { IRuleResult } from '../types';
+import {IRuleResult} from '../types';
 
 export type Formatter = (results: IRuleResult[]) => string;

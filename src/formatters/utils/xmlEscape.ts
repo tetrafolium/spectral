@@ -33,18 +33,18 @@ export const xmlEscape = (s: string) => {
   // eslint-disable-next-line no-control-regex
   return `${s}`.replace(/[<>&"'\x00-\x1F\x7F\u0080-\uFFFF]/gu, c => {
     switch (c) {
-      case '<':
-        return '&lt;';
-      case '>':
-        return '&gt;';
-      case '&':
-        return '&amp;';
-      case '"':
-        return '&quot;';
-      case "'":
-        return '&apos;';
-      default:
-        return `&#${c.charCodeAt(0)};`;
+    case '<':
+      return '&lt;';
+    case '>':
+      return '&gt;';
+    case '&':
+      return '&amp;';
+    case '"':
+      return '&quot;';
+    case "'":
+      return '&apos;';
+    default:
+      return `&#${c.charCodeAt(0)};`;
     }
   });
 };

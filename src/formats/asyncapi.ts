@@ -1,9 +1,10 @@
-import { isObject } from 'lodash';
+import {isObject} from 'lodash';
 
-type MaybeAsyncApi2 = Partial<{ asyncapi: unknown }>;
+type MaybeAsyncApi2 = Partial<{asyncapi : unknown}>;
 
 const bearsAStringPropertyNamed = (document: unknown, propertyName: string) => {
-  return isObject(document) && propertyName in document && typeof document[propertyName] === 'string';
+  return isObject(document) && propertyName in document &&
+         typeof document[propertyName] === 'string';
 };
 
 const version2Regex = /^2\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/;

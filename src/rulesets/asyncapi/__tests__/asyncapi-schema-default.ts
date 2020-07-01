@@ -1,8 +1,8 @@
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
 
-import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
-import { Rule } from '../../../rule';
-import { Spectral } from '../../../spectral';
+import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
+import {Rule} from '../../../rule';
+import {Spectral} from '../../../spectral';
 
 const ruleName = 'asyncapi-schema-default';
 let s: Spectral;
@@ -14,87 +14,99 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi: '2.0.0',
-    channels: {
-      'users/{userId}/signedUp': {
-        parameters: {
-          userId: {
-            schema: {
-              default: 17,
+    asyncapi : '2.0.0',
+    channels : {
+      'users/{userId}/signedUp' : {
+        parameters : {
+          userId : {
+            schema : {
+              default : 17,
             },
           },
         },
       },
     },
-    components: {
-      parameters: {
-        orphanParameter: {
-          schema: {
-            default: 17,
+    components : {
+      parameters : {
+        orphanParameter : {
+          schema : {
+            default : 17,
           },
         },
       },
-      schemas: {
-        aSchema: {
-          default: 17,
+      schemas : {
+        aSchema : {
+          default : 17,
         },
       },
     },
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, { ignoreUnknownFormat: false });
+    const results = await s.run(doc, {ignoreUnknownFormat : false});
 
     expect(results).toEqual([]);
   });
 
-  test('return result if components.schemas.{schema}.default is not valid against the schema it decorates', async () => {
-    const clone = cloneDeep(doc);
+  test(
+      'return result if components.schemas.{schema}.default is not valid against the schema it decorates',
+      async () => {
+        const clone = cloneDeep(doc);
 
-    clone.components.schemas.aSchema.type = 'string';
+        clone.components.schemas.aSchema.type = 'string';
 
-    const results = await s.run(clone, { ignoreUnknownFormat: false });
+        const results = await s.run(clone, {ignoreUnknownFormat : false});
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: ruleName,
-        message: '`default` property type should be string',
-        path: ['components', 'schemas', 'aSchema', 'default'],
-        severity: rule.severity,
-      }),
-    ]);
-  });
+        expect(results).toEqual([
+          expect.objectContaining({
+            code : ruleName,
+            message : '`default` property type should be string',
+            path : [ 'components', 'schemas', 'aSchema', 'default' ],
+            severity : rule.severity,
+          }),
+        ]);
+      });
 
-  test('return result if components.parameters.{parameter}.schema.default is not valid against the schema it decorates', async () => {
-    const clone = cloneDeep(doc);
+  test(
+      'return result if components.parameters.{parameter}.schema.default is not valid against the schema it decorates',
+      async () => {
+        const clone = cloneDeep(doc);
 
-    clone.components.parameters.orphanParameter.schema.type = 'string';
+        clone.components.parameters.orphanParameter.schema.type = 'string';
 
-    const results = await s.run(clone, { ignoreUnknownFormat: false });
+        const results = await s.run(clone, {ignoreUnknownFormat : false});
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: ruleName,
-        message: '`default` property type should be string',
-        path: ['components', 'parameters', 'orphanParameter', 'schema', 'default'],
-        severity: rule.severity,
-      }),
-    ]);
-  });
+        expect(results).toEqual([
+          expect.objectContaining({
+            code : ruleName,
+            message : '`default` property type should be string',
+            path : [
+              'components', 'parameters', 'orphanParameter', 'schema', 'default'
+            ],
+            severity : rule.severity,
+          }),
+        ]);
+      });
 
-  test('return result if channels.{channel}.parameters.{parameter}.schema.default is not valid against the schema it decorates', async () => {
-    const clone = cloneDeep(doc);
+  test(
+      'return result if channels.{channel}.parameters.{parameter}.schema.default is not valid against the schema it decorates',
+      async () => {
+        const clone = cloneDeep(doc);
 
-    clone.channels['users/{userId}/signedUp'].parameters.userId.schema.type = 'string';
-    const results = await s.run(clone, { ignoreUnknownFormat: false });
+        clone.channels['users/{userId}/signedUp']
+            .parameters.userId.schema.type = 'string';
+        const results = await s.run(clone, {ignoreUnknownFormat : false});
 
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: ruleName,
-        message: '`default` property type should be string',
-        path: ['channels', 'users/{userId}/signedUp', 'parameters', 'userId', 'schema', 'default'],
-        severity: rule.severity,
-      }),
-    ]);
-  });
+        expect(results).toEqual([
+          expect.objectContaining({
+            code : ruleName,
+            message : '`default` property type should be string',
+            path : [
+              'channels', 'users/{userId}/signedUp', 'parameters', 'userId',
+              'schema', 'default'
+            ],
+            severity : rule.severity,
+          }),
+        ]);
+      });
 });

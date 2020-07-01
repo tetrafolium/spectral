@@ -1,16 +1,16 @@
-import type { Segment } from '@stoplight/types';
-import type { IFunction, IFunctionResult } from '../../../types';
+import type {Segment} from '@stoplight/types';
+import type {IFunction, IFunctionResult} from '../../../types';
 
 const pathRegex = /(\{[a-zA-Z0-9_-]+\})+/g;
 
 interface IParam {
-  in?: string;
+  in ?: string;
   name?: string;
   required?: boolean;
 }
 
 interface INamedPathParam {
-  in: 'path';
+  in : 'path';
   name: string;
   required?: boolean;
 }
@@ -20,11 +20,11 @@ const isNamedPathParam = (p: IParam): p is INamedPathParam => {
 };
 
 const isUnknownNamedPathParam = (
-  p: IParam,
-  path: Segment[],
-  results: IFunctionResult[],
-  seens: Array<Record<string, unknown>>,
-): p is INamedPathParam => {
+    p: IParam,
+    path: Segment[],
+    results: IFunctionResult[],
+    seens: Array<Record<string, unknown>>,
+    ): p is INamedPathParam => {
   if (!isNamedPathParam(p)) {
     return false;
   }
@@ -44,11 +44,11 @@ const isUnknownNamedPathParam = (
 };
 
 const ensureAllDefinedPathParamsAreUsedInPath = (
-  path: string,
-  params: Record<string, Segment[]>,
-  expected: Record<string, unknown>,
-  results: IFunctionResult[],
-) => {
+    path: string,
+    params: Record<string, Segment[]>,
+    expected: Record<string, unknown>,
+    results: IFunctionResult[],
+    ) => {
   for (const p in params) {
     if (!params[p]) {
       continue;
@@ -56,18 +56,19 @@ const ensureAllDefinedPathParamsAreUsedInPath = (
 
     if (!(p in expected)) {
       const resPath = params[p];
-      results.push(generateResult(`Parameter \`${p}\` is not used in the path \`${path}\`.`, resPath));
+      results.push(generateResult(
+          `Parameter \`${p}\` is not used in the path \`${path}\`.`, resPath));
     }
   }
 };
 
 const ensureAllExpectedParamsinPathAreDefined = (
-  path: string,
-  params: Record<string, Segment[]>,
-  expected: Record<string, unknown>,
-  operationPath: Segment[],
-  results: IFunctionResult[],
-) => {
+    path: string,
+    params: Record<string, Segment[]>,
+    expected: Record<string, unknown>,
+    operationPath: Segment[],
+    results: IFunctionResult[],
+    ) => {
   for (const p in expected) {
     if (!expected[p]) {
       continue;
@@ -75,10 +76,11 @@ const ensureAllExpectedParamsinPathAreDefined = (
 
     if (!(p in params)) {
       results.push(
-        generateResult(
-          `The operation does not define the parameter \`{${p}}\` expected by path \`${path}\`.`,
-          operationPath,
-        ),
+          generateResult(
+              `The operation does not define the parameter \`{${
+                  p}}\` expected by path \`${path}\`.`,
+              operationPath,
+              ),
       );
     }
   }
@@ -87,14 +89,15 @@ const ensureAllExpectedParamsinPathAreDefined = (
 export const oasPathParam: IFunction = (targetVal, _options, paths, vals) => {
   const results: IFunctionResult[] = [];
 
-  const { original: object } = vals;
+  const {original : object} = vals;
 
   /**
    * This rule verifies:
    *
-   * 1. for every param referenced in the path string ie /users/{userId}, var must be defined in either
-   *    path.parameters, or operation.parameters object
-   * 2. every path.parameters + operation.parameters property must be used in the path string
+   * 1. for every param referenced in the path string ie /users/{userId}, var
+   * must be defined in either path.parameters, or operation.parameters object
+   * 2. every path.parameters + operation.parameters property must be used in
+   * the path string
    */
 
   if (!object.paths) {
@@ -103,21 +106,26 @@ export const oasPathParam: IFunction = (targetVal, _options, paths, vals) => {
 
   // keep track of normalized paths for verifying paths are unique
   const uniquePaths: object = {};
-  const validOperationKeys = ['get', 'head', 'post', 'put', 'patch', 'delete', 'options', 'trace'];
+  const validOperationKeys =
+      [ 'get', 'head', 'post', 'put', 'patch', 'delete', 'options', 'trace' ];
 
   for (const path in object.paths) {
-    if (!object.paths[path]) continue;
+    if (!object.paths[path])
+      continue;
 
-    // verify normalized paths are functionally unique (ie `/path/{one}` vs `/path/{two}` are
-    // different but equivalent within the context of OAS)
-    const normalized = path.replace(pathRegex, '%'); // '%' is used here since its invalid in paths
+    // verify normalized paths are functionally unique (ie `/path/{one}` vs
+    // `/path/{two}` are different but equivalent within the context of OAS)
+    const normalized = path.replace(
+        pathRegex, '%'); // '%' is used here since its invalid in paths
     if (uniquePaths[normalized]) {
       results.push(
-        generateResult(`The paths \`${uniquePaths[normalized]}\` and \`${path}\` are equivalent.`, [
-          ...paths.given,
-          'paths',
-          path,
-        ]),
+          generateResult(`The paths \`${uniquePaths[normalized]}\` and \`${
+                             path}\` are equivalent.`,
+                         [
+                           ...paths.given,
+                           'paths',
+                           path,
+                         ]),
       );
     } else {
       uniquePaths[normalized] = path;
@@ -132,10 +140,11 @@ export const oasPathParam: IFunction = (targetVal, _options, paths, vals) => {
         const p = match[0].replace(/[{}]/g, '');
         if (pathElements[p]) {
           results.push(
-            generateResult(
-              `The path \`${path}\` uses the parameter \`{${p}}\` multiple times. Path parameters must be unique.`,
-              [...paths.given, 'paths', path],
-            ),
+              generateResult(
+                  `The path \`${path}\` uses the parameter \`{${
+                      p}}\` multiple times. Path parameters must be unique.`,
+                  [...paths.given, 'paths', path ],
+                  ),
           );
         } else {
           pathElements[p] = {};
@@ -148,19 +157,23 @@ export const oasPathParam: IFunction = (targetVal, _options, paths, vals) => {
     // find parameters set within the top-level 'parameters' object
     const topParams = {};
     for (const i in object.paths[path].parameters) {
-      if (!object.paths[path].parameters[i]) continue;
+      if (!object.paths[path].parameters[i])
+        continue;
 
       const p: IParam = object.paths[path].parameters[i];
-      const fullParameterPath = [...paths.given, 'paths', path, 'parameters', i];
+      const fullParameterPath =
+          [...paths.given, 'paths', path, 'parameters', i ];
 
-      if (isUnknownNamedPathParam(p, fullParameterPath, results, [topParams])) {
+      if (isUnknownNamedPathParam(p, fullParameterPath, results,
+                                  [ topParams ])) {
         topParams[p.name] = fullParameterPath;
       }
     }
 
     // find parameters set within the operation's 'parameters' object
     for (const op in object.paths[path]) {
-      if (!object.paths[path][op]) continue;
+      if (!object.paths[path][op])
+        continue;
 
       if (op === 'parameters' || !validOperationKeys.includes(op)) {
         continue;
@@ -169,39 +182,44 @@ export const oasPathParam: IFunction = (targetVal, _options, paths, vals) => {
       const operationParams = {};
       const parameters = object.paths[path][op].parameters;
 
-      const operationPath = [...paths.given, 'paths', path, op];
+      const operationPath = [...paths.given, 'paths', path, op ];
 
       for (const i in parameters) {
-        if (!Object.hasOwnProperty.call(parameters, i)) continue;
+        if (!Object.hasOwnProperty.call(parameters, i))
+          continue;
 
         const p: IParam = parameters[i];
-        const fullParameterPath = [...operationPath, 'parameters', i];
+        const fullParameterPath = [...operationPath, 'parameters', i ];
 
-        if (isUnknownNamedPathParam(p, fullParameterPath, results, [topParams, operationParams])) {
+        if (isUnknownNamedPathParam(p, fullParameterPath, results,
+                                    [ topParams, operationParams ])) {
           operationParams[p.name] = fullParameterPath;
         }
       }
 
-      const definedParams = { ...topParams, ...operationParams };
-      ensureAllDefinedPathParamsAreUsedInPath(path, definedParams, pathElements, results);
-      ensureAllExpectedParamsinPathAreDefined(path, definedParams, pathElements, operationPath, results);
+      const definedParams = {...topParams, ...operationParams};
+      ensureAllDefinedPathParamsAreUsedInPath(path, definedParams, pathElements,
+                                              results);
+      ensureAllExpectedParamsinPathAreDefined(path, definedParams, pathElements,
+                                              operationPath, results);
     }
   }
 
   return results;
 };
 
-function generateResult(message: string, path: Array<string | number>): IFunctionResult {
+function generateResult(message: string,
+                        path: Array<string|number>): IFunctionResult {
   return {
     message,
     path,
   };
 }
 
-const requiredMessage = (name: string) =>
-  `Path parameter \`${name}\` must have a \`required\` property that is set to \`true\`.`;
+const requiredMessage = (name: string) => `Path parameter \`${
+    name}\` must have a \`required\` property that is set to \`true\`.`;
 
-const uniqueDefinitionMessage = (name: string) =>
-  `Path parameter \`${name}\` is defined multiple times. Path parameters must be unique.`;
+const uniqueDefinitionMessage = (name: string) => `Path parameter \`${
+    name}\` is defined multiple times. Path parameters must be unique.`;
 
 export default oasPathParam;

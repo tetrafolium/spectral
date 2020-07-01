@@ -1,5 +1,5 @@
-import { DiagnosticSeverity } from '@stoplight/types';
-import { Spectral } from '../../../spectral';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {Spectral} from '../../../spectral';
 
 export default (s: Spectral, oasVersion: number) => {
   test('should work for shared level parameters', async () => {
@@ -57,8 +57,9 @@ export default (s: Spectral, oasVersion: number) => {
     expect(results.length).toEqual(0);
   });
 
-  test('return errors if top level path parameter description is missing', async () => {
-    const results = await s.run({
+  test('return errors if top level path parameter description is missing',
+       async () => {
+         const results = await s.run({
       swagger: '2.0',
       paths: {
         '/todos': {
@@ -72,18 +73,19 @@ export default (s: Spectral, oasVersion: number) => {
         },
       },
     });
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: `oas${oasVersion}-parameter-description`,
-        message: 'Parameter objects should have a `description`.',
-        path: ['paths', '/todos', 'parameters', '0'],
-        severity: DiagnosticSeverity.Warning,
-      }),
-    ]);
-  });
+         expect(results).toEqual([
+           expect.objectContaining({
+             code : `oas${oasVersion}-parameter-description`,
+             message : 'Parameter objects should have a `description`.',
+             path : [ 'paths', '/todos', 'parameters', '0' ],
+             severity : DiagnosticSeverity.Warning,
+           }),
+         ]);
+       });
 
-  test('return errors if operation level parameter description is missing', async () => {
-    const results = await s.run({
+  test('return errors if operation level parameter description is missing',
+       async () => {
+         const results = await s.run({
       swagger: '2.0',
       paths: {
         '/todos': {
@@ -99,30 +101,31 @@ export default (s: Spectral, oasVersion: number) => {
         },
       },
     });
-    expect(results).toEqual([
-      expect.objectContaining({
-        code: `oas${oasVersion}-parameter-description`,
-        message: 'Parameter objects should have a `description`.',
-        path: ['paths', '/todos', 'get', 'parameters', '0'],
-        severity: 1,
-      }),
-    ]);
-  });
+         expect(results).toEqual([
+           expect.objectContaining({
+             code : `oas${oasVersion}-parameter-description`,
+             message : 'Parameter objects should have a `description`.',
+             path : [ 'paths', '/todos', 'get', 'parameters', '0' ],
+             severity : 1,
+           }),
+         ]);
+       });
 
   test('does not throw on refs', () => {
     return expect(
-      s.run({
-        swagger: '2.0',
-        paths: {
-          '/todos': {
-            parameters: [
-              {
-                $ref: '#/parameters/limit',
-              },
-            ],
-          },
-        },
-      }),
-    ).resolves.toBeInstanceOf(Array);
+               s.run({
+                 swagger : '2.0',
+                 paths : {
+                   '/todos' : {
+                     parameters : [
+                       {
+                         $ref : '#/parameters/limit',
+                       },
+                     ],
+                   },
+                 },
+               }),
+               )
+        .resolves.toBeInstanceOf(Array);
   });
 };

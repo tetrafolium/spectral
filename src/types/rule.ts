@@ -1,5 +1,5 @@
-import { DiagnosticSeverity } from '@stoplight/types';
-import { RuleType } from './enums';
+import {DiagnosticSeverity} from '@stoplight/types';
+import {RuleType} from './enums';
 
 export interface IRule<T = string, O = any> {
   type?: RuleType;
@@ -13,25 +13,27 @@ export interface IRule<T = string, O = any> {
   description?: string;
 
   // The severity of results this rule generates
-  severity?: DiagnosticSeverity | HumanReadableDiagnosticSeverity;
+  severity?: DiagnosticSeverity|HumanReadableDiagnosticSeverity;
 
-  // some rules are more important than others, recommended rules will be enabled by default
-  // true by default
+  // some rules are more important than others, recommended rules will be
+  // enabled by default true by default
   recommended?: boolean;
 
   // Filter the target down to a subset[] with a JSON path
-  given: string | string[];
+  given: string|string[];
 
   // If false, rule will operate on original (unresolved) data
   // If undefined or true, resolved data will be supplied
   resolved?: boolean;
 
-  then: IThen<T, O> | Array<IThen<T, O>>;
+  then: IThen<T, O>|Array<IThen<T, O>>;
 }
 
 export interface IThen<T = string, O = any> {
-  // the `path.to.prop` to field, or special `@key` value to target keys for matched `given` object
-  // EXAMPLE: if the target object is an oas object and given = `$..responses[*]`, then `@key` would be the response code (200, 400, etc)
+  // the `path.to.prop` to field, or special `@key` value to target keys for
+  // matched `given` object EXAMPLE: if the target object is an oas object and
+  // given = `$..responses[*]`, then `@key` would be the response code (200,
+  // 400, etc)
   field?: string;
 
   // name of the function to run
@@ -41,4 +43,5 @@ export interface IThen<T = string, O = any> {
   functionOptions?: O;
 }
 
-export type HumanReadableDiagnosticSeverity = 'error' | 'warn' | 'info' | 'hint' | 'off';
+export type HumanReadableDiagnosticSeverity =
+    'error'|'warn'|'info'|'hint'|'off';

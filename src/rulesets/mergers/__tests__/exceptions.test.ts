@@ -1,8 +1,8 @@
-import { escapeRegExp } from 'lodash';
-import { RulesetExceptionCollection } from '../../../types/ruleset';
-import { mergeExceptions } from '../exceptions';
+import {escapeRegExp} from 'lodash';
 
-import { buildRulesetExceptionCollectionFrom } from '../../../../setupTests';
+import {buildRulesetExceptionCollectionFrom} from '../../../../setupTests';
+import {RulesetExceptionCollection} from '../../../types/ruleset';
+import {mergeExceptions} from '../exceptions';
 
 describe('Ruleset exceptions merging', () => {
   describe('when loaded from a ruleset', () => {
@@ -10,60 +10,60 @@ describe('Ruleset exceptions merging', () => {
 
     it('includes new exceptions', () => {
       const target: RulesetExceptionCollection = {
-        'file.yaml#/a': [],
-        'file.yaml#/b': ['1', '2'],
+        'file.yaml#/a' : [],
+        'file.yaml#/b' : [ '1', '2' ],
       };
 
       const source: RulesetExceptionCollection = {
-        'file.yaml#/c': ['3'],
-        'file.yaml#/d': ['4', '5'],
+        'file.yaml#/c' : [ '3' ],
+        'file.yaml#/d' : [ '4', '5' ],
       };
 
       mergeExceptions(target, source, dummyRulesetUri);
 
       expect(target).toEqual({
-        'file.yaml#/a': [],
-        'file.yaml#/b': ['1', '2'],
-        'file.yaml#/c': ['3'],
-        'file.yaml#/d': ['4', '5'],
+        'file.yaml#/a' : [],
+        'file.yaml#/b' : [ '1', '2' ],
+        'file.yaml#/c' : [ '3' ],
+        'file.yaml#/d' : [ '4', '5' ],
       });
     });
 
     it('merges existing exceptions', () => {
       const target: RulesetExceptionCollection = {
-        'file.yaml#/a': [],
-        'file.yaml#/b': ['1', '3'],
+        'file.yaml#/a' : [],
+        'file.yaml#/b' : [ '1', '3' ],
       };
 
       const source: RulesetExceptionCollection = {
-        'file.yaml#/a': ['0'],
-        'file.yaml#/b': ['2', '4'],
+        'file.yaml#/a' : [ '0' ],
+        'file.yaml#/b' : [ '2', '4' ],
       };
 
       mergeExceptions(target, source, dummyRulesetUri);
 
       expect(target).toEqual({
-        'file.yaml#/a': ['0'],
-        'file.yaml#/b': ['1', '2', '3', '4'],
+        'file.yaml#/a' : [ '0' ],
+        'file.yaml#/b' : [ '1', '2', '3', '4' ],
       });
     });
 
     it('deduplicates exceptions', () => {
       const target: RulesetExceptionCollection = {
-        'file.yaml#/a': [],
-        'file.yaml#/b': ['1', '3'],
+        'file.yaml#/a' : [],
+        'file.yaml#/b' : [ '1', '3' ],
       };
 
       const source: RulesetExceptionCollection = {
-        'file.yaml#/a': ['0', '0'],
-        'file.yaml#/b': ['2', '4', '2', '3'],
+        'file.yaml#/a' : [ '0', '0' ],
+        'file.yaml#/b' : [ '2', '4', '2', '3' ],
       };
 
       mergeExceptions(target, source, dummyRulesetUri);
 
       expect(target).toEqual({
-        'file.yaml#/a': ['0'],
-        'file.yaml#/b': ['1', '2', '3', '4'],
+        'file.yaml#/a' : [ '0' ],
+        'file.yaml#/b' : [ '1', '2', '3', '4' ],
       });
     });
 
@@ -81,18 +81,18 @@ describe('Ruleset exceptions merging', () => {
         ];
 
         it.each(invalidLocations)(
-          'throws when locations are not valid uris (including fragment): "%s"',
-          async location => {
-            const source = buildRulesetExceptionCollectionFrom(location);
+            'throws when locations are not valid uris (including fragment): "%s"',
+            async location => {
+              const source = buildRulesetExceptionCollectionFrom(location);
 
-            expect(() => {
-              mergeExceptions({}, source, dummyRulesetUri);
-            }).toThrow(
-              new RegExp(
-                `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${escapeRegExp(location)}\`.+is not a valid uri`,
-              ),
-            );
-          },
+              expect(() => { mergeExceptions({}, source, dummyRulesetUri); })
+                  .toThrow(
+                      new RegExp(
+                          `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${
+                              escapeRegExp(location)}\`.+is not a valid uri`,
+                          ),
+                  );
+            },
         );
       });
 
@@ -100,94 +100,133 @@ describe('Ruleset exceptions merging', () => {
         const location = 'one.yaml#/';
         const source = buildRulesetExceptionCollectionFrom(location, []);
 
-        expect(() => {
-          mergeExceptions({}, source, dummyRulesetUri);
-        }).toThrow(
-          new RegExp(
-            `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${escapeRegExp(
-              location,
-            )}\`.+An empty array of rules has been provided`,
-          ),
-        );
+        expect(() => { mergeExceptions({}, source, dummyRulesetUri); })
+            .toThrow(
+                new RegExp(
+                    `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${
+                        escapeRegExp(
+                            location,
+                            )}\`.+An empty array of rules has been provided`,
+                    ),
+            );
       });
 
       describe('throws on empty rule name', () => {
         const location = 'one.yaml#/';
-        const source = buildRulesetExceptionCollectionFrom(location, ['b', '']);
+        const source =
+            buildRulesetExceptionCollectionFrom(location, [ 'b', '' ]);
 
-        expect(() => {
-          mergeExceptions({}, source, dummyRulesetUri);
-        }).toThrow(
-          new RegExp(
-            `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${escapeRegExp(
-              location,
-            )}\`.+A rule with an empty name has been provided`,
-          ),
-        );
+        expect(() => { mergeExceptions({}, source, dummyRulesetUri); })
+            .toThrow(
+                new RegExp(
+                    `.+\`${escapeRegExp(dummyRulesetUri)}\`.+\\(key \`${
+                        escapeRegExp(
+                            location,
+                            )}\`.+A rule with an empty name has been provided`,
+                    ),
+            );
       });
     });
 
     describe('Normalization', () => {
-      const relativeLocations: Array<[string, string, string]> = [
-        ['./ruleset.yaml', 'one.yaml#', 'one.yaml#'],
-        ['./ruleset.yaml', 'one.yaml#/', 'one.yaml#/'],
-        ['./ruleset.yaml', 'one.yaml#/toto', 'one.yaml#/toto'],
-        ['./ruleset.yaml', 'down/one.yaml#/toto', 'down/one.yaml#/toto'],
-        ['./ruleset.yaml', '../one.yaml#/toto', '../one.yaml#/toto'],
-        ['../ruleset.yaml', 'one.yaml#', '../one.yaml#'],
-        ['../ruleset.yaml', 'one.yaml#/', '../one.yaml#/'],
-        ['../ruleset.yaml', 'one.yaml#/toto', '../one.yaml#/toto'],
-        ['../ruleset.yaml', 'down/one.yaml#/toto', '../down/one.yaml#/toto'],
-        ['../ruleset.yaml', '../one.yaml#/toto', '../../one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'one.yaml#', 'https://dot.com/r/one.yaml#'],
-        ['https://dot.com/r/ruleset.yaml', 'one.yaml#/', 'https://dot.com/r/one.yaml#/'],
-        ['https://dot.com/r/ruleset.yaml', 'one.yaml#/toto', 'https://dot.com/r/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'down/one.yaml#/toto', 'https://dot.com/r/down/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', '../one.yaml#/toto', 'https://dot.com/one.yaml#/toto'],
+      const relativeLocations: Array<[ string, string, string ]> = [
+        [ './ruleset.yaml', 'one.yaml#', 'one.yaml#' ],
+        [ './ruleset.yaml', 'one.yaml#/', 'one.yaml#/' ],
+        [ './ruleset.yaml', 'one.yaml#/toto', 'one.yaml#/toto' ],
+        [ './ruleset.yaml', 'down/one.yaml#/toto', 'down/one.yaml#/toto' ],
+        [ './ruleset.yaml', '../one.yaml#/toto', '../one.yaml#/toto' ],
+        [ '../ruleset.yaml', 'one.yaml#', '../one.yaml#' ],
+        [ '../ruleset.yaml', 'one.yaml#/', '../one.yaml#/' ],
+        [ '../ruleset.yaml', 'one.yaml#/toto', '../one.yaml#/toto' ],
+        [ '../ruleset.yaml', 'down/one.yaml#/toto', '../down/one.yaml#/toto' ],
+        [ '../ruleset.yaml', '../one.yaml#/toto', '../../one.yaml#/toto' ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'one.yaml#',
+          'https://dot.com/r/one.yaml#'
+        ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'one.yaml#/',
+          'https://dot.com/r/one.yaml#/'
+        ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'one.yaml#/toto',
+          'https://dot.com/r/one.yaml#/toto'
+        ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'down/one.yaml#/toto',
+          'https://dot.com/r/down/one.yaml#/toto'
+        ],
+        [
+          'https://dot.com/r/ruleset.yaml', '../one.yaml#/toto',
+          'https://dot.com/one.yaml#/toto'
+        ],
       ];
 
       it.each(relativeLocations)(
-        'combines relative locations with ruleset uri (ruleset: "%s", location: "%s")',
-        (rulesetUri, location, expectedLocation) => {
-          const source = buildRulesetExceptionCollectionFrom(location);
-          const target = {};
+          'combines relative locations with ruleset uri (ruleset: "%s", location: "%s")',
+          (rulesetUri, location, expectedLocation) => {
+            const source = buildRulesetExceptionCollectionFrom(location);
+            const target = {};
 
-          mergeExceptions(target, source, rulesetUri);
+            mergeExceptions(target, source, rulesetUri);
 
-          const expected = buildRulesetExceptionCollectionFrom(expectedLocation);
-          expect(target).toEqual(expected);
-        },
+            const expected =
+                buildRulesetExceptionCollectionFrom(expectedLocation);
+            expect(target).toEqual(expected);
+          },
       );
 
-      const absoluteLocations: Array<[string, string, string]> = [
-        ['./ruleset.yaml', 'https://dot.com/one.yaml#/toto', 'https://dot.com/one.yaml#/toto'],
-        ['../ruleset.yaml', 'https://dot.com/one.yaml#/toto', 'https://dot.com/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'https://dot.com/one.yaml#/toto', 'https://dot.com/one.yaml#/toto'],
-        ['./ruleset.yaml', '/local/one.yaml#/toto', '/local/one.yaml#/toto'],
-        ['../ruleset.yaml', '/local/one.yaml#/toto', '/local/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', '/local/one.yaml#/toto', '/local/one.yaml#/toto'],
-        ['./ruleset.yaml', 'c:/one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['../ruleset.yaml', 'c:/one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'c:/one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['./ruleset.yaml', 'c:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['../ruleset.yaml', 'c:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'c:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['./ruleset.yaml', 'C:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['../ruleset.yaml', 'C:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
-        ['https://dot.com/r/ruleset.yaml', 'C:\\one.yaml#/toto', 'c:/one.yaml#/toto'],
+      const absoluteLocations: Array<[ string, string, string ]> = [
+        [
+          './ruleset.yaml', 'https://dot.com/one.yaml#/toto',
+          'https://dot.com/one.yaml#/toto'
+        ],
+        [
+          '../ruleset.yaml', 'https://dot.com/one.yaml#/toto',
+          'https://dot.com/one.yaml#/toto'
+        ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'https://dot.com/one.yaml#/toto',
+          'https://dot.com/one.yaml#/toto'
+        ],
+        [ './ruleset.yaml', '/local/one.yaml#/toto', '/local/one.yaml#/toto' ],
+        [ '../ruleset.yaml', '/local/one.yaml#/toto', '/local/one.yaml#/toto' ],
+        [
+          'https://dot.com/r/ruleset.yaml', '/local/one.yaml#/toto',
+          '/local/one.yaml#/toto'
+        ],
+        [ './ruleset.yaml', 'c:/one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [ '../ruleset.yaml', 'c:/one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'c:/one.yaml#/toto',
+          'c:/one.yaml#/toto'
+        ],
+        [ './ruleset.yaml', 'c:\\one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [ '../ruleset.yaml', 'c:\\one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'c:\\one.yaml#/toto',
+          'c:/one.yaml#/toto'
+        ],
+        [ './ruleset.yaml', 'C:\\one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [ '../ruleset.yaml', 'C:\\one.yaml#/toto', 'c:/one.yaml#/toto' ],
+        [
+          'https://dot.com/r/ruleset.yaml', 'C:\\one.yaml#/toto',
+          'c:/one.yaml#/toto'
+        ],
       ];
 
       it.each(absoluteLocations)(
-        'normalize absolute locations (ruleset: "%s", location: "%s")',
-        (rulesetUri, location, expectedLocation) => {
-          const source = buildRulesetExceptionCollectionFrom(location);
-          const target = {};
+          'normalize absolute locations (ruleset: "%s", location: "%s")',
+          (rulesetUri, location, expectedLocation) => {
+            const source = buildRulesetExceptionCollectionFrom(location);
+            const target = {};
 
-          mergeExceptions(target, source, rulesetUri);
+            mergeExceptions(target, source, rulesetUri);
 
-          const expected = buildRulesetExceptionCollectionFrom(expectedLocation);
-          expect(target).toEqual(expected);
-        },
+            const expected =
+                buildRulesetExceptionCollectionFrom(expectedLocation);
+            expect(target).toEqual(expected);
+          },
       );
     });
   });

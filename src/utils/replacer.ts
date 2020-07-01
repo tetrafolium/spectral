@@ -1,13 +1,15 @@
-import { Dictionary } from '@stoplight/types';
+import {Dictionary} from '@stoplight/types';
 
-export type Transformer<V = unknown, VV = object> = (identifier: string, value: V, values: VV) => string;
+export type Transformer<V = unknown, VV = object> =
+    (identifier: string, value: V, values: VV) => string;
 
 export class Replacer<V extends object> {
   protected readonly regex: RegExp;
   protected readonly transformers: Dictionary<Transformer<V[keyof V], V>>;
 
   constructor(count: number) {
-    this.regex = new RegExp(`${'{'.repeat(count)}([^}\n]+)${'}'.repeat(count)}`, 'g');
+    this.regex =
+        new RegExp(`${'{'.repeat(count)}([^}\n]+)${'}'.repeat(count)}`, 'g');
 
     this.transformers = {};
   }
@@ -26,7 +28,8 @@ export class Replacer<V extends object> {
 
       for (const transformer of transformers) {
         if (transformer in this.transformers) {
-          values[identifier] = this.transformers[transformer](identifier, values[identifier], values);
+          values[identifier] = this.transformers[transformer](
+              identifier, values[identifier], values);
         }
       }
 

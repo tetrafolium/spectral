@@ -23,55 +23,65 @@
  * @author Julian Laval
  */
 import * as path from '@stoplight/path';
-import { Dictionary } from '@stoplight/types';
+import {Dictionary} from '@stoplight/types';
 import * as eol from 'eol';
 import * as fs from 'fs';
-import { template } from 'lodash';
-import { IRuleResult } from '../../types';
-import { Formatter } from '../types';
-import { getHighestSeverity, getSeverityName, getSummary, getSummaryForSource, groupBySource } from '../utils';
+import {template} from 'lodash';
+import {IRuleResult} from '../../types';
+import {Formatter} from '../types';
+import {
+  getHighestSeverity,
+  getSeverityName,
+  getSummary,
+  getSummaryForSource,
+  groupBySource
+} from '../utils';
 
 // ------------------------------------------------------------------------------
 // Helpers
 // ------------------------------------------------------------------------------
 
-const pageTemplate = template(eol.lf(fs.readFileSync(path.join(__dirname, 'html-template-page.html'), 'utf8')));
-const messageTemplate = template(eol.lf(fs.readFileSync(path.join(__dirname, 'html-template-message.html'), 'utf8')));
-const resultTemplate = template(eol.lf(fs.readFileSync(path.join(__dirname, 'html-template-result.html'), 'utf8')));
+const pageTemplate = template(eol.lf(
+    fs.readFileSync(path.join(__dirname, 'html-template-page.html'), 'utf8')));
+const messageTemplate = template(eol.lf(fs.readFileSync(
+    path.join(__dirname, 'html-template-message.html'), 'utf8')));
+const resultTemplate = template(eol.lf(fs.readFileSync(
+    path.join(__dirname, 'html-template-result.html'), 'utf8')));
 
 function renderMessages(messages: IRuleResult[], parentIndex: number) {
   return messages
-    .map(message => {
-      const line = message.range.start.line + 1;
-      const character = message.range.start.character + 1;
+      .map(message => {
+        const line = message.range.start.line + 1;
+        const character = message.range.start.character + 1;
 
-      return messageTemplate({
-        parentIndex,
-        line,
-        character,
-        severity: getSeverityName(message.severity),
-        message: message.message,
-        code: message.code,
-      });
-    })
-    .join('\n');
+        return messageTemplate({
+          parentIndex,
+          line,
+          character,
+          severity : getSeverityName(message.severity),
+          message : message.message,
+          code : message.code,
+        });
+      })
+      .join('\n');
 }
 
 function renderResults(groupedResults: Dictionary<IRuleResult[]>) {
   return Object.keys(groupedResults)
-    .map(
-      (source, index) =>
-        resultTemplate({
-          index,
-          color:
-            groupedResults[source].length === 0
-              ? 'success'
-              : getSeverityName(getHighestSeverity(groupedResults[source])),
-          filePath: source,
-          summary: getSummaryForSource(groupedResults[source]),
-        }) + renderMessages(groupedResults[source], index),
-    )
-    .join('\n');
+      .map(
+          (source, index) =>
+              resultTemplate({
+                index,
+                color : groupedResults[source].length === 0
+                            ? 'success'
+                            : getSeverityName(
+                                  getHighestSeverity(groupedResults[source])),
+                filePath : source,
+                summary : getSummaryForSource(groupedResults[source]),
+              }) +
+              renderMessages(groupedResults[source], index),
+          )
+      .join('\n');
 }
 
 // ------------------------------------------------------------------------------
@@ -79,13 +89,15 @@ function renderResults(groupedResults: Dictionary<IRuleResult[]>) {
 // ------------------------------------------------------------------------------
 
 export const html: Formatter = results => {
-  const color = results.length === 0 ? 'success' : getSeverityName(getHighestSeverity(results));
+  const color = results.length === 0
+                    ? 'success'
+                    : getSeverityName(getHighestSeverity(results));
   const groupedResults = groupBySource(results);
 
   return pageTemplate({
-    date: new Date(),
+    date : new Date(),
     color,
-    summary: getSummary(groupedResults),
-    results: renderResults(groupedResults),
+    summary : getSummary(groupedResults),
+    results : renderResults(groupedResults),
   });
 };

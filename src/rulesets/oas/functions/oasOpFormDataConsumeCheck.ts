@@ -1,4 +1,4 @@
-import type { IFunction, IFunctionResult } from '../../../types';
+import type {IFunction, IFunctionResult} from '../../../types';
 
 export const oasOpFormDataConsumeCheck: IFunction = targetVal => {
   const results: IFunctionResult[] = [];
@@ -7,9 +7,11 @@ export const oasOpFormDataConsumeCheck: IFunction = targetVal => {
   const consumes = targetVal.consumes || [];
 
   if (parameters?.find((p: any) => p.in === 'formData')) {
-    if (!consumes.join(',').match(/(application\/x-www-form-urlencoded|multipart\/form-data)/)) {
+    if (!consumes.join(',').match(
+            /(application\/x-www-form-urlencoded|multipart\/form-data)/)) {
       results.push({
-        message: 'consumes must include urlencoded, multipart, or formdata media type when using formData parameter',
+        message :
+            'consumes must include urlencoded, multipart, or formdata media type when using formData parameter',
       });
     }
   }

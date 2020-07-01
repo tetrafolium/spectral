@@ -1,23 +1,33 @@
-import { safeStringify } from '@stoplight/json';
-import { Resolver } from '@stoplight/json-ref-resolver';
-import { DiagnosticSeverity, Dictionary, Optional } from '@stoplight/types';
-import { YamlParserResult } from '@stoplight/yaml';
-import { memoize, merge } from 'lodash';
-import type { Agent } from 'http';
+import {safeStringify} from '@stoplight/json';
+import {Resolver} from '@stoplight/json-ref-resolver';
+import {DiagnosticSeverity, Dictionary, Optional} from '@stoplight/types';
+import {YamlParserResult} from '@stoplight/yaml';
+import {memoize, merge} from 'lodash';
+import type {Agent} from 'http';
 
-import { STATIC_ASSETS } from './assets';
-import { Document, IDocument, IParsedResult, isParsedResult, ParsedDocument, normalizeSource } from './document';
-import { DocumentInventory } from './documentInventory';
-import { CoreFunctions, functions as coreFunctions } from './functions';
+import {STATIC_ASSETS} from './assets';
+import {
+  Document,
+  IDocument,
+  IParsedResult,
+  isParsedResult,
+  ParsedDocument,
+  normalizeSource
+} from './document';
+import {DocumentInventory} from './documentInventory';
+import {CoreFunctions, functions as coreFunctions} from './functions';
 import * as Parsers from './parsers';
 import request from './request';
-import { createHttpAndFileResolver } from './resolvers/http-and-file';
-import { OptimizedRule, Rule } from './rule';
-import { readRuleset } from './rulesets';
-import { compileExportedFunction, setFunctionContext } from './rulesets/evaluators';
-import { mergeExceptions } from './rulesets/mergers/exceptions';
-import { IRulesetReadOptions } from './rulesets/reader';
-import { Runner, RunnerRuntime } from './runner';
+import {createHttpAndFileResolver} from './resolvers/http-and-file';
+import {OptimizedRule, Rule} from './rule';
+import {readRuleset} from './rulesets';
+import {
+  compileExportedFunction,
+  setFunctionContext
+} from './rulesets/evaluators';
+import {mergeExceptions} from './rulesets/mergers/exceptions';
+import {IRulesetReadOptions} from './rulesets/reader';
+import {Runner, RunnerRuntime} from './runner';
 import {
   FormatLookup,
   FunctionCollection,
@@ -32,9 +42,14 @@ import {
   RuleCollection,
   RunRuleCollection,
 } from './types';
-import { IRuleset, RulesetExceptionCollection } from './types/ruleset';
-import { ComputeFingerprintFunc, defaultComputeResultFingerprint, empty, isNimmaEnvVariableSet } from './utils';
-import { generateDocumentWideResult } from './utils/generateDocumentWideResult';
+import {IRuleset, RulesetExceptionCollection} from './types/ruleset';
+import {
+  ComputeFingerprintFunc,
+  defaultComputeResultFingerprint,
+  empty,
+  isNimmaEnvVariableSet
+} from './utils';
+import {generateDocumentWideResult} from './utils/generateDocumentWideResult';
 
 memoize.Cache = WeakMap;
 
@@ -42,9 +57,9 @@ export * from './types';
 
 export class Spectral {
   private readonly _resolver: IResolver;
-  private readonly agent: Agent | undefined;
+  private readonly agent: Agent|undefined;
 
-  public functions: FunctionCollection & CoreFunctions = { ...coreFunctions };
+  public functions: FunctionCollection&CoreFunctions = {...coreFunctions};
   public rules: RunRuleCollection = {};
   public exceptions: RulesetExceptionCollection = {};
   public formats: RegisteredFormats;
@@ -57,15 +72,17 @@ export class Spectral {
     this._computeFingerprint = memoize(opts?.computeFingerprint ?? defaultComputeResultFingerprint);
 
     if (opts?.proxyUri) {
-      // using eval so bundlers do not include proxy-agent when Spectral is used in the browser
+      // using eval so bundlers do not include proxy-agent when Spectral is used
+      // in the browser
       const ProxyAgent = eval('require')('proxy-agent');
       this.agent = new ProxyAgent(opts.proxyUri);
     }
     if (opts?.resolver) {
       this._resolver = opts.resolver;
     } else {
-      this._resolver =
-        typeof window === 'undefined' ? createHttpAndFileResolver({ agent: this.agent }) : new Resolver();
+      this._resolver = typeof window === 'undefined'
+                           ? createHttpAndFileResolver({agent : this.agent})
+                           : new Resolver();
     }
 
     this.formats = {};
@@ -78,28 +95,31 @@ export class Spectral {
   }
 
   protected parseDocument(
-    target: IParsedResult | IDocument | object | string,
-    documentUri: Optional<string>,
-  ): IDocument {
+      target: IParsedResult|IDocument|object|string,
+      documentUri: Optional<string>,
+      ): IDocument {
     return target instanceof Document
-      ? target
-      : isParsedResult(target)
-      ? new ParsedDocument(target)
-      : new Document<unknown, YamlParserResult<unknown>>(
-          typeof target === 'string' ? target : safeStringify(target, undefined, 2),
-          Parsers.Yaml,
-          documentUri,
-        );
+               ? target
+               : isParsedResult(target)
+                     ? new ParsedDocument(target)
+                     : new Document<unknown, YamlParserResult<unknown>>(
+                           typeof target === 'string'
+                               ? target
+                               : safeStringify(target, undefined, 2),
+                           Parsers.Yaml,
+                           documentUri,
+                       );
   }
 
   public async runWithResolved(
-    target: IParsedResult | IDocument | object | string,
-    opts: IRunOpts = {},
-  ): Promise<ISpectralFullResult> {
+      target: IParsedResult|IDocument|object|string,
+      opts: IRunOpts = {},
+      ): Promise<ISpectralFullResult> {
     const document = this.parseDocument(target, opts.resolve?.documentUri);
 
     if (document.source === null && opts.resolve?.documentUri !== void 0) {
-      (document as Omit<Document, 'source'> & { source: string }).source = normalizeSource(opts.resolve.documentUri);
+      (document as Omit<Document, 'source'>& {source : string}).source =
+          normalizeSource(opts.resolve.documentUri);
     }
 
     const inventory = new DocumentInventory(document, this._resolver);
@@ -109,7 +129,8 @@ export class Spectral {
 
     if (document.formats === void 0) {
       const registeredFormats = Object.keys(this.formats);
-      const foundFormats = registeredFormats.filter(format => this.formats[format](inventory.resolved));
+      const foundFormats = registeredFormats.filter(
+          format => this.formats[format](inventory.resolved));
       if (foundFormats.length === 0 && opts.ignoreUnknownFormat !== true) {
         document.formats = null;
         if (registeredFormats.length > 0) {
@@ -121,27 +142,28 @@ export class Spectral {
     }
 
     await runner.run({
-      rules: this.rules,
-      functions: this.functions,
-      exceptions: this.exceptions,
+      rules : this.rules,
+      functions : this.functions,
+      exceptions : this.exceptions,
     });
 
     const results = runner.getResults(this._computeFingerprint);
 
     return {
-      resolved: inventory.resolved,
+      resolved : inventory.resolved,
       results,
     };
   }
 
-  public async run(target: IParsedResult | Document | object | string, opts: IRunOpts = {}): Promise<IRuleResult[]> {
+  public async run(target: IParsedResult|Document|object|string,
+                   opts: IRunOpts = {}): Promise<IRuleResult[]> {
     return (await this.runWithResolved(target, opts)).results;
   }
 
   public setFunctions(functions: FunctionCollection): void {
     empty(this.functions);
 
-    Object.assign(this.functions, { ...coreFunctions, ...functions });
+    Object.assign(this.functions, {...coreFunctions, ...functions});
   }
 
   public setRules(rules: RuleCollection): void {
@@ -175,8 +197,10 @@ export class Spectral {
     Object.assign(this.exceptions, target);
   }
 
-  public async loadRuleset(uris: string[] | string, options?: IRulesetReadOptions) {
-    this.setRuleset(await readRuleset(Array.isArray(uris) ? uris : [uris], { agent: this.agent, ...options }));
+  public async loadRuleset(uris: string[]|string,
+                           options?: IRulesetReadOptions) {
+    this.setRuleset(await readRuleset(Array.isArray(uris) ? uris : [ uris ],
+                                      {agent : this.agent, ...options}));
   }
 
   public setRuleset(ruleset: IRuleset) {
@@ -185,43 +209,44 @@ export class Spectral {
     this.setRules(ruleset.rules);
 
     this.setFunctions(
-      Object.entries(ruleset.functions).reduce<FunctionCollection>(
-        (fns, [key, { code, ref, name, source, schema }]) => {
-          if (code === void 0) {
-            if (ref !== void 0) {
-              ({ code } = ruleset.functions[ref]);
-            }
-          }
+        Object.entries(ruleset.functions)
+            .reduce<FunctionCollection>(
+                (fns, [ key, {code, ref, name, source, schema} ]) => {
+                  if (code === void 0) {
+                    if (ref !== void 0) {
+                      ({code} = ruleset.functions[ref]);
+                    }
+                  }
 
-          if (code === void 0) {
-            // shall we log or sth?
-            return fns;
-          }
+                  if (code === void 0) {
+                    // shall we log or sth?
+                    return fns;
+                  }
 
-          const context: IFunctionContext = {
-            functions: this.functions,
-            cache: new Map(),
-          };
+                  const context: IFunctionContext = {
+                    functions : this.functions,
+                    cache : new Map(),
+                  };
 
-          fns[key] = setFunctionContext(
-            context,
-            compileExportedFunction({
-              code,
-              name,
-              source,
-              schema,
-              inject: {
-                fetch: request,
-                spectral: this.runtime.spawn(),
-              },
-            }),
-          );
-          return fns;
-        },
-        {
-          ...coreFunctions,
-        },
-      ),
+                  fns[key] = setFunctionContext(
+                      context,
+                      compileExportedFunction({
+                        code,
+                        name,
+                        source,
+                        schema,
+                        inject : {
+                          fetch : request,
+                          spectral : this.runtime.spawn(),
+                        },
+                      }),
+                  );
+                  return fns;
+                },
+                {
+                  ...coreFunctions,
+                },
+                ),
     );
 
     this.setExceptions(ruleset.exceptions);
@@ -233,10 +258,11 @@ export class Spectral {
 
   private _generateUnrecognizedFormatError(document: IDocument): IRuleResult {
     return generateDocumentWideResult(
-      document,
-      `The provided document does not match any of the registered formats [${Object.keys(this.formats).join(', ')}]`,
-      DiagnosticSeverity.Warning,
-      'unrecognized-format',
+        document,
+        `The provided document does not match any of the registered formats [${
+            Object.keys(this.formats).join(', ')}]`,
+        DiagnosticSeverity.Warning,
+        'unrecognized-format',
     );
   }
 }
