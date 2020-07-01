@@ -1,0 +1,29 @@
+inspecode:
+
+  clang-format:
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  #fortify:
+  #  thresholds: { num-issues: 999 }
+
+  fossology:
+    thresholds: { num-issues: 999 }
+  
+  grep:
+    thresholds: { num-issues: 999 }
+
+  jscpd:
+    thresholds: { num-issues: 999 }
+  
+  misspell:
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  prettier:
+    auto-fix: true
+    thresholds: { num-issues: 999 }
+
+  tslint:
+    auto-fix: true
+    thresholds: { num-issues: 999 }
