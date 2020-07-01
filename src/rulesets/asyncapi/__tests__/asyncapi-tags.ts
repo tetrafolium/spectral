@@ -1,8 +1,8 @@
-import {cloneDeep} from 'lodash';
+import { cloneDeep } from 'lodash';
 
-import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
-import {Rule} from '../../../rule';
-import {Spectral} from '../../../spectral';
+import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
+import { Rule } from '../../../rule';
+import { Spectral } from '../../../spectral';
 
 const ruleName = 'asyncapi-tags';
 let s: Spectral;
@@ -14,12 +14,12 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi : '2.0.0',
-    tags : [ {name : 'one'}, {name : 'another'} ],
+    asyncapi: '2.0.0',
+    tags: [{ name: 'one' }, { name: 'another' }],
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, {ignoreUnknownFormat : false});
+    const results = await s.run(doc, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([]);
   });
@@ -29,14 +29,14 @@ describe(`Rule '${ruleName}'`, () => {
 
     delete clone.tags;
 
-    const results = await s.run(clone, {ignoreUnknownFormat : false});
+    const results = await s.run(clone, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([
       expect.objectContaining({
-        code : ruleName,
-        message : 'AsyncAPI object should have non-empty `tags` array.',
-        path : [],
-        severity : rule.severity,
+        code: ruleName,
+        message: 'AsyncAPI object should have non-empty `tags` array.',
+        path: [],
+        severity: rule.severity,
       }),
     ]);
   });

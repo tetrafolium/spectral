@@ -1,8 +1,8 @@
-import {cloneDeep} from 'lodash';
+import { cloneDeep } from 'lodash';
 
-import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
-import {Rule} from '../../../rule';
-import {Spectral} from '../../../spectral';
+import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
+import { Rule } from '../../../rule';
+import { Spectral } from '../../../spectral';
 
 const ruleName = 'asyncapi-tag-description';
 let s: Spectral;
@@ -14,17 +14,17 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi : '2.0.0',
-    tags : [
+    asyncapi: '2.0.0',
+    tags: [
       {
-        name : 'a tag',
-        description : "I'm a tag.",
+        name: 'a tag',
+        description: "I'm a tag.",
       },
     ],
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, {ignoreUnknownFormat : false});
+    const results = await s.run(doc, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([]);
   });
@@ -34,14 +34,14 @@ describe(`Rule '${ruleName}'`, () => {
 
     delete clone.tags[0].description;
 
-    const results = await s.run(clone, {ignoreUnknownFormat : false});
+    const results = await s.run(clone, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([
       expect.objectContaining({
-        code : ruleName,
-        message : 'Tag object should have a `description`.',
-        path : [ 'tags', '0' ],
-        severity : rule.severity,
+        code: ruleName,
+        message: 'Tag object should have a `description`.',
+        path: ['tags', '0'],
+        severity: rule.severity,
       }),
     ]);
   });

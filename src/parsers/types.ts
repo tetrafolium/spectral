@@ -1,4 +1,4 @@
-import {GetLocationForJsonPath, IParserResult} from '@stoplight/types';
+import { GetLocationForJsonPath, IParserResult } from '@stoplight/types';
 
 export interface IParser<R extends IParserResult = IParserResult<unknown>> {
   parse(input: string): R;

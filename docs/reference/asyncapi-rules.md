@@ -1,6 +1,7 @@
 # AsyncAPI Rules
 
-Spectral has a built-in "asyncapi" ruleset for the [AsyncAPI Specification](https://www.asyncapi.com/docs/specifications/2.0.0/).
+Spectral has a built-in "asyncapi" ruleset for the
+[AsyncAPI Specification](https://www.asyncapi.com/docs/specifications/2.0.0/).
 
 In your ruleset file you can add `extends: "spectral:asyncapi"` and you'll get all of the following rules applied.
 
@@ -20,7 +21,10 @@ Query parameters and fragments shouldn't be used in channel names. Instead, use 
 
 ### asyncapi-channel-no-trailing-slash
 
-Keep trailing slashes off of channel names, as it can cause some confusion. Most messaging protocols will treat `example/foo` and `example/foo/` as different things. Keep in mind that tooling may replace slashes (`/`) with protocol-specific notation (e.g.: `.` for AMQP), therefore, a trailing slash may result in an invalid channel name in some protocols.
+Keep trailing slashes off of channel names, as it can cause some confusion. Most messaging protocols will treat
+`example/foo` and `example/foo/` as different things. Keep in mind that tooling may replace slashes (`/`) with
+protocol-specific notation (e.g.: `.` for AMQP), therefore, a trailing slash may result in an invalid channel name in
+some protocols.
 
 **Recommended:** Yes
 
@@ -32,20 +36,23 @@ The schema definition of the application headers must be of type “object”.
 
 ### asyncapi-info-contact-properties
 
-The [asyncapi-info-contact](#asyncapi-info-contact) rule will ask you to put in a contact object, and this rule will make sure it's full of the most useful properties: `name`, `url` and `email`.
+The [asyncapi-info-contact](#asyncapi-info-contact) rule will ask you to put in a contact object, and this rule will
+make sure it's full of the most useful properties: `name`, `url` and `email`.
 
-Putting in the name of the developer/team/department/company responsible for the API, along with the support email and help-desk/GitHub Issues/whatever URL means people know where to go for help. This can mean more money in the bank, instead of developers just wandering off or complaining online.
+Putting in the name of the developer/team/department/company responsible for the API, along with the support email and
+help-desk/GitHub Issues/whatever URL means people know where to go for help. This can mean more money in the bank,
+instead of developers just wandering off or complaining online.
 
 **Recommended:** Yes
 
 **Good Example**
 
 ```yaml
-asyncapi: "2.0.0"
+asyncapi: '2.0.0'
 info:
   title: Awesome API
   description: A very well defined API
-  version: "1.0"
+  version: '1.0'
   contact:
     name: A-Team
     email: a-team@goarmy.com
@@ -56,17 +63,18 @@ info:
 
 Info object should contain `contact` object.
 
-Hopefully your API description document is so good that nobody ever needs to contact you with questions, but that is rarely the case. The contact object has a few different options for contact details.
+Hopefully your API description document is so good that nobody ever needs to contact you with questions, but that is
+rarely the case. The contact object has a few different options for contact details.
 
 **Recommended:** Yes
 
 **Good Example**
 
 ```yaml
-asyncapi: "2.0.0"
+asyncapi: '2.0.0'
 info:
   title: Awesome API
-  version: "1.0"
+  version: '1.0'
   contact:
     name: A-Team
     email: a-team@goarmy.com
@@ -76,32 +84,34 @@ info:
 
 AsyncAPI object info `description` must be present and non-empty string.
 
-Examples can contain Markdown so you can really go to town with them, implementing getting started information like where to find authentication keys, and how to use them.
+Examples can contain Markdown so you can really go to town with them, implementing getting started information like
+where to find authentication keys, and how to use them.
 
 **Recommended:** Yes
 
 **Good Example**
 
 ```yaml
-asyncapi: "2.0.0"
+asyncapi: '2.0.0'
 info:
-  version: "1.0.0"
+  version: '1.0.0'
   title: Descriptive API
   description: >+
-    Some description about the general point of this API, and why it exists when another similar but different API also exists.
-
+    Some description about the general point of this API, and why it exists when another similar but different API also
+    exists.
 ```
 
 ### asyncapi-info-license-url
 
-Mentioning a license is only useful if people know what the license means, so add a link to the full text for those who need it.
+Mentioning a license is only useful if people know what the license means, so add a link to the full text for those who
+need it.
 
 **Recommended:** No
 
 **Good Example**
 
 ```yaml
-asyncapi: "2.0.0"
+asyncapi: '2.0.0'
 info:
   license:
     name: MIT
@@ -112,7 +122,8 @@ info:
 
 The `info` object should have a `license` key.
 
-It can be hard to pick a license, so if you don't have a lawyer around you can use [TLDRLegal](https://tldrlegal.com/) and [Choose a License](https://choosealicense.com/) to help give you an idea.
+It can be hard to pick a license, so if you don't have a lawyer around you can use [TLDRLegal](https://tldrlegal.com/)
+and [Choose a License](https://choosealicense.com/) to help give you an idea.
 
 How useful this is in court is not entirely known, but having a license is better than not having a license.
 
@@ -121,7 +132,7 @@ How useful this is in court is not entirely known, but having a license is bette
 **Good Example**
 
 ```yaml
-asyncapi: "2.0.0"
+asyncapi: '2.0.0'
 info:
   license:
     name: MIT
@@ -135,7 +146,8 @@ Operation objects should have a description.
 
 ### asyncapi-operation-operationId
 
-This operation ID is essentially a reference for the operation. Tools may use it for defining function names, class method names, and even URL hashes in documentation systems.
+This operation ID is essentially a reference for the operation. Tools may use it for defining function names, class
+method names, and even URL hashes in documentation systems.
 
 **Recommended:** Yes
 
@@ -153,7 +165,7 @@ Parameter objects should have a `description`.
 
 **Good Example**
 
-``` yaml
+```yaml
 payload:
   type: object
   properties:
@@ -167,7 +179,7 @@ payload:
 
 **Bad Example**
 
-``` yaml
+```yaml
 payload:
   type: object
   properties:
@@ -187,7 +199,7 @@ Values of the `examples` array should be valid against the `payload` they decora
 
 **Good Example**
 
-``` yaml
+```yaml
 payload:
   type: object
   properties:
@@ -202,7 +214,7 @@ payload:
 
 **Bad Example**
 
-``` yaml
+```yaml
 payload:
   type: object
   properties:
@@ -211,19 +223,19 @@ payload:
   required:
     - value
   examples:
-    - value: nope!       # Wrong type
-    - notGoodEither: 17  # Missing required property
+    - value: nope! # Wrong type
+    - notGoodEither: 17 # Missing required property
 ```
 
 ### asyncapi-payload-unsupported-schemaFormat
 
 AsyncAPI can support various `schemaFormat` values. When unspecified, one of the following will be assumed:
 
-application/vnd.aai.asyncapi;version=2.0.0
-application/vnd.aai.asyncapi+json;version=2.0.0
+application/vnd.aai.asyncapi;version=2.0.0 application/vnd.aai.asyncapi+json;version=2.0.0
 application/vnd.aai.asyncapi+yaml;version=2.0.0
 
-At this point, explicitly setting `schemaFormat` is not supported by Spectral, so if you use it this rule will emit an info message and skip validating the payload.
+At this point, explicitly setting `schemaFormat` is not supported by Spectral, so if you use it this rule will emit an
+info message and skip validating the payload.
 
 Other formats such as OpenAPI Schema Object, JSON Schema Draft 07 and Avro will be added in various upcoming versions.
 
@@ -263,13 +275,14 @@ Server URL variable declarations cannot be empty, ex.`gigantic-server.com/{}` is
 
 Server URL should not have a trailing slash.
 
-Some tooling forgets to strip trailing slashes off when it's joining the `servers.url` with `channels`, and you can get awkward URLs like `mqtt://example.com/broker//pets`. Best to just strip them off yourself.
+Some tooling forgets to strip trailing slashes off when it's joining the `servers.url` with `channels`, and you can get
+awkward URLs like `mqtt://example.com/broker//pets`. Best to just strip them off yourself.
 
 **Recommended:** Yes
 
 **Good Example**
 
-``` yaml
+```yaml
 servers:
   - url: mqtt://example.com
   - url: mqtt://example.com/broker
@@ -277,7 +290,7 @@ servers:
 
 **Bad Example**
 
-``` yaml
+```yaml
 servers:
   - url: mqtt://example.com/
   - url: mqtt://example.com/broker/
@@ -307,7 +320,9 @@ tags:
     description: Angry short-legged omnivores.
 ```
 
-If your tags are business objects then you can use the term to explain them a bit. An 'Account' could be a user account, company information, bank account, potential sales lead, anything. What is clear to the folks writing the document is probably not as clear to others.
+If your tags are business objects then you can use the term to explain them a bit. An 'Account' could be a user account,
+company information, bank account, potential sales lead, anything. What is clear to the folks writing the document is
+probably not as clear to others.
 
 ```yaml
 tags:
@@ -352,10 +367,11 @@ Why? Well, you _can_ reference tags arbitrarily in operations, and definition is
 /invoices/{id}/items:
   get:
     tags:
-    - Invoice Items
+      - Invoice Items
 ```
 
-Defining tags allows you to add more information like a `description`. For more information see [asyncapi-tag-description](#asyncapi-tag-description).
+Defining tags allows you to add more information like a `description`. For more information see
+[asyncapi-tag-description](#asyncapi-tag-description).
 
 **Recommended:** Yes
 
@@ -364,8 +380,8 @@ Defining tags allows you to add more information like a `description`. For more 
 Potential unused reusable `schema` entry has been detected.
 
 <!-- theme: warning -->
-*Warning:* This rule may identify false positives when linting a specification
-that acts as a library (a container storing reusable objects, leveraged by other
-specifications that reference those objects).
+
+_Warning:_ This rule may identify false positives when linting a specification that acts as a library (a container
+storing reusable objects, leveraged by other specifications that reference those objects).
 
 **Recommended:** Yes

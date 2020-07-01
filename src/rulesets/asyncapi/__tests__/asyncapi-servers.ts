@@ -1,8 +1,8 @@
-import {cloneDeep} from 'lodash';
+import { cloneDeep } from 'lodash';
 
-import {buildTestSpectralWithAsyncApiRule} from '../../../../setupTests';
-import {Rule} from '../../../rule';
-import {Spectral} from '../../../spectral';
+import { buildTestSpectralWithAsyncApiRule } from '../../../../setupTests';
+import { Rule } from '../../../rule';
+import { Spectral } from '../../../spectral';
 
 const ruleName = 'asyncapi-servers';
 let s: Spectral;
@@ -14,17 +14,17 @@ describe(`Rule '${ruleName}'`, () => {
   });
 
   const doc: any = {
-    asyncapi : '2.0.0',
-    servers : {
-      production : {
-        url : 'stoplight.io',
-        protocol : 'https',
+    asyncapi: '2.0.0',
+    servers: {
+      production: {
+        url: 'stoplight.io',
+        protocol: 'https',
       },
     },
   };
 
   test('validates a correct object', async () => {
-    const results = await s.run(doc, {ignoreUnknownFormat : false});
+    const results = await s.run(doc, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([]);
   });
@@ -34,15 +34,14 @@ describe(`Rule '${ruleName}'`, () => {
 
     delete clone.servers;
 
-    const results = await s.run(clone, {ignoreUnknownFormat : false});
+    const results = await s.run(clone, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([
       expect.objectContaining({
-        code : ruleName,
-        message :
-            'AsyncAPI object should contain a non empty `servers` object.',
-        path : [],
-        severity : rule.severity,
+        code: ruleName,
+        message: 'AsyncAPI object should contain a non empty `servers` object.',
+        path: [],
+        severity: rule.severity,
       }),
     ]);
   });
@@ -53,15 +52,14 @@ describe(`Rule '${ruleName}'`, () => {
     delete clone.servers.production;
     expect(clone.servers).toEqual({});
 
-    const results = await s.run(clone, {ignoreUnknownFormat : false});
+    const results = await s.run(clone, { ignoreUnknownFormat: false });
 
     expect(results).toEqual([
       expect.objectContaining({
-        code : ruleName,
-        message :
-            'AsyncAPI object should contain a non empty `servers` object.',
-        path : [ 'servers' ],
-        severity : rule.severity,
+        code: ruleName,
+        message: 'AsyncAPI object should contain a non empty `servers` object.',
+        path: ['servers'],
+        severity: rule.severity,
       }),
     ]);
   });

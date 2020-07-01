@@ -7,13 +7,13 @@
  * The primary use case for this was validating OpenAPI examples
  * against their schema, but this could be used for other things.
  */
-import {Optional} from '@stoplight/types';
-import {JSONPath} from 'jsonpath-plus';
+import { Optional } from '@stoplight/types';
+import { JSONPath } from 'jsonpath-plus';
 
-import {getLintTargets} from '../runner/utils/getLintTargets';
-import {IFunction, IFunctionResult} from '../types';
+import { getLintTargets } from '../runner/utils/getLintTargets';
+import { IFunction, IFunctionResult } from '../types';
 
-import {schema} from './schema';
+import { schema } from './schema';
 
 export interface ISchemaPathOptions {
   schemaPath: string;
@@ -22,23 +22,21 @@ export interface ISchemaPathOptions {
   field?: string;
   // The oasVersion, either 2 or 3 for OpenAPI Spec versions, could also be 3.1
   // or a larger number if there's a need for it, otherwise JSON Schema
-  oasVersion?: Optional<2|3|3.1>;
+  oasVersion?: Optional<2 | 3 | 3.1>;
   allErrors?: boolean;
 }
 
-export const schemaPath: IFunction<ISchemaPathOptions> =
-    (targetVal, opts, paths, otherValues) => {
-      // The subsection of the targetVal which contains the good bit
-      const relevantItems = getLintTargets(targetVal, opts.field);
+export const schemaPath: IFunction<ISchemaPathOptions> = (targetVal, opts, paths, otherValues) => {
+  // The subsection of the targetVal which contains the good bit
+  const relevantItems = getLintTargets(targetVal, opts.field);
 
-      // The subsection of the targetValue which contains the schema for us to
-      // validate the good bit against
-      const schemaObject =
-          JSONPath({path : opts.schemaPath, json : targetVal})[0];
+  // The subsection of the targetValue which contains the schema for us to
+  // validate the good bit against
+  const schemaObject = JSONPath({ path: opts.schemaPath, json: targetVal })[0];
 
-      const results: IFunctionResult[] = [];
+  const results: IFunctionResult[] = [];
 
-      for (const relevantItem of relevantItems) {
+  for (const relevantItem of relevantItems) {
     const result = schema(
       relevantItem.value,
       {
@@ -56,7 +54,7 @@ export const schemaPath: IFunction<ISchemaPathOptions> =
     if (Array.isArray(result)) {
       results.push(...result);
     }
-      }
+  }
 
-      return results;
-    };
+  return results;
+};

@@ -1,4 +1,4 @@
-import {IFunction, IFunctionResult} from '../types';
+import { IFunction, IFunctionResult } from '../types';
 
 export interface ILengthRuleOptions {
   min?: number;
@@ -6,10 +6,9 @@ export interface ILengthRuleOptions {
 }
 
 export const length: IFunction<ILengthRuleOptions> = (targetVal, opts) => {
-  if (targetVal === void 0 || targetVal === null)
-    return;
+  if (targetVal === void 0 || targetVal === null) return;
 
-  const {min, max} = opts;
+  const { min, max } = opts;
 
   let value;
   const valueType = typeof targetVal;
@@ -23,20 +22,19 @@ export const length: IFunction<ILengthRuleOptions> = (targetVal, opts) => {
     value = targetVal.length;
   }
 
-  if (typeof value === 'undefined')
-    return;
+  if (typeof value === 'undefined') return;
 
   const results: IFunctionResult[] = [];
 
   if (typeof min !== 'undefined' && value < min) {
     results.push({
-      message : `min length is ${min}`,
+      message: `min length is ${min}`,
     });
   }
 
   if (typeof max !== 'undefined' && value > max) {
     results.push({
-      message : `max length is ${max}`,
+      message: `max length is ${max}`,
     });
   }
 

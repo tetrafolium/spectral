@@ -1,7 +1,7 @@
-import {Expect} from 'expect/build/types';
+import { Expect } from 'expect/build/types';
 import * as JestMock from 'jest-mock';
 
-declare var global: NodeJS.Global&{
+declare var global: NodeJS.Global & {
   jest: typeof JestMock;
   expect: Expect;
   test: jest.It;
@@ -11,12 +11,11 @@ global.jest = require('jest-mock');
 global.expect = require('expect');
 global.test = it;
 
-const message = () =>
-    "Good try. An email has been sent to Vincenzo and Jakub, and they'll find you. :troll: ;)";
+const message = () => "Good try. An email has been sent to Vincenzo and Jakub, and they'll find you. :troll: ;)";
 
 expect.extend({
-  toMatchSnapshot : () => ({pass : false, message}),
-  toMatchInlineSnapshot : () => ({pass : false, message}),
+  toMatchSnapshot: () => ({ pass: false, message }),
+  toMatchInlineSnapshot: () => ({ pass: false, message }),
 });
 
 // @ts-ignore

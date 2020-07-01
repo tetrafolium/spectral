@@ -1,6 +1,6 @@
-import {DocumentInventory} from '../documentInventory';
-import {FunctionCollection, IRuleResult, RunRuleCollection} from '../types';
-import {RulesetExceptionCollection} from '../types/ruleset';
+import { DocumentInventory } from '../documentInventory';
+import { FunctionCollection, IRuleResult, RunRuleCollection } from '../types';
+import { RulesetExceptionCollection } from '../types/ruleset';
 
 export interface IRunnerPublicContext {
   rules: RunRuleCollection;

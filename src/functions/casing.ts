@@ -1,6 +1,6 @@
-import {Dictionary} from '@stoplight/types';
-import {escapeRegExp} from 'lodash';
-import {IFunction} from '../types';
+import { Dictionary } from '@stoplight/types';
+import { escapeRegExp } from 'lodash';
+import { IFunction } from '../types';
 
 export enum CasingType {
   flat = 'flat',
@@ -15,19 +15,17 @@ export enum CasingType {
 export interface ICasingOptions {
   type: CasingType;
   disallowDigits?: boolean;
-  separator?: {char: string; allowLeading?: boolean;};
+  separator?: { char: string; allowLeading?: boolean };
 }
 
 const CASES: Dictionary<string, CasingType> = {
-  [CasingType.flat] : '[a-z][a-z{__DIGITS__}]*',
-  [CasingType.camel] :
-      '[a-z][a-z{__DIGITS__}]*(?:[A-Z{__DIGITS__}][a-z{__DIGITS__}]+)*',
-  [CasingType.pascal] :
-      '[A-Z][a-z{__DIGITS__}]*(?:[A-Z{__DIGITS__}][a-z{__DIGITS__}]+)*',
-  [CasingType.kebab] : '[a-z][a-z{__DIGITS__}]*(?:-[a-z{__DIGITS__}]+)*',
-  [CasingType.cobol] : '[A-Z][A-Z{__DIGITS__}]*(?:-[A-Z{__DIGITS__}]+)*',
-  [CasingType.snake] : '[a-z][a-z{__DIGITS__}]*(?:_[a-z{__DIGITS__}]+)*',
-  [CasingType.macro] : '[A-Z][A-Z{__DIGITS__}]*(?:_[A-Z{__DIGITS__}]+)*',
+  [CasingType.flat]: '[a-z][a-z{__DIGITS__}]*',
+  [CasingType.camel]: '[a-z][a-z{__DIGITS__}]*(?:[A-Z{__DIGITS__}][a-z{__DIGITS__}]+)*',
+  [CasingType.pascal]: '[A-Z][a-z{__DIGITS__}]*(?:[A-Z{__DIGITS__}][a-z{__DIGITS__}]+)*',
+  [CasingType.kebab]: '[a-z][a-z{__DIGITS__}]*(?:-[a-z{__DIGITS__}]+)*',
+  [CasingType.cobol]: '[A-Z][A-Z{__DIGITS__}]*(?:-[A-Z{__DIGITS__}]+)*',
+  [CasingType.snake]: '[a-z][a-z{__DIGITS__}]*(?:_[a-z{__DIGITS__}]+)*',
+  [CasingType.macro]: '[A-Z][A-Z{__DIGITS__}]*(?:_[A-Z{__DIGITS__}]+)*',
 };
 
 export const casing: IFunction<ICasingOptions> = (targetVal, opts) => {
@@ -35,9 +33,12 @@ export const casing: IFunction<ICasingOptions> = (targetVal, opts) => {
     return;
   }
 
-  if (targetVal.length === 1 && opts.separator !== void 0 &&
-      opts.separator.allowLeading === true &&
-      targetVal === opts.separator.char) {
+  if (
+    targetVal.length === 1 &&
+    opts.separator !== void 0 &&
+    opts.separator.allowLeading === true &&
+    targetVal === opts.separator.char
+  ) {
     return;
   }
 
@@ -49,7 +50,7 @@ export const casing: IFunction<ICasingOptions> = (targetVal, opts) => {
 
   return [
     {
-      message : `must be ${opts.type} case`,
+      message: `must be ${opts.type} case`,
     },
   ];
 };
@@ -59,17 +60,14 @@ const DIGITS_PATTERN = '0-9';
 const buildFrom = (basePattern: string, overrides: ICasingOptions): RegExp => {
   const injectDigits = overrides.disallowDigits !== true;
 
-  const pattern = basePattern.replace(/\{__DIGITS__\}/g,
-                                      injectDigits ? DIGITS_PATTERN : '');
+  const pattern = basePattern.replace(/\{__DIGITS__\}/g, injectDigits ? DIGITS_PATTERN : '');
 
   if (overrides.separator === undefined) {
     return new RegExp(`^${pattern}$`);
   }
 
   const separatorPattern = `[${escapeRegExp(overrides.separator.char)}]`;
-  const leadingSeparatorPattern =
-      overrides.separator.allowLeading === true ? `${separatorPattern}?` : '';
+  const leadingSeparatorPattern = overrides.separator.allowLeading === true ? `${separatorPattern}?` : '';
 
-  return new RegExp(`^${leadingSeparatorPattern}${pattern}(?:${
-      separatorPattern}${pattern})*$`);
+  return new RegExp(`^${leadingSeparatorPattern}${pattern}(?:${separatorPattern}${pattern})*$`);
 };

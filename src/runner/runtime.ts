@@ -1,9 +1,11 @@
-import {createEventEmitter, IDisposable} from '@stoplight/lifecycle';
+import { createEventEmitter, IDisposable } from '@stoplight/lifecycle';
 
 type Revokable = () => void;
 
 export type SpectralEvents = {
-  setup(): void; beforeTeardown() : void; afterTeardown() : void;
+  setup(): void;
+  beforeTeardown(): void;
+  afterTeardown(): void;
 };
 
 export class RunnerRuntime extends createEventEmitter<SpectralEvents>() {
@@ -16,7 +18,7 @@ export class RunnerRuntime extends createEventEmitter<SpectralEvents>() {
   }
 
   public persist<O extends object>(obj: O): O {
-    const {proxy, revoke} = Proxy.revocable<O>(obj, {});
+    const { proxy, revoke } = Proxy.revocable<O>(obj, {});
     this.revokables.push(revoke);
     return proxy;
   }
@@ -31,17 +33,16 @@ export class RunnerRuntime extends createEventEmitter<SpectralEvents>() {
 
   public spawn(): Pick<RunnerRuntime, 'on'> {
     return this.persist(
-        Object.freeze({
-          on : this.hijackDisposable(this.on),
-        }),
+      Object.freeze({
+        on: this.hijackDisposable(this.on),
+      }),
     );
   }
 
-  protected hijackDisposable<F extends(...args: any[]) => IDisposable>(fn: F):
-      F {
+  protected hijackDisposable<F extends (...args: any[]) => IDisposable>(fn: F): F {
     return ((...args) => {
-             // eslint-disable-next-line @typescript-eslint/unbound-method
-             this.revokables.push(fn.apply(this, args).dispose);
-           }) as F;
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      this.revokables.push(fn.apply(this, args).dispose);
+    }) as F;
   }
 }

@@ -16,9 +16,9 @@
 import * as $RefParser from '@apidevtools/json-schema-ref-parser';
 import * as path from '@stoplight/path';
 import * as fs from 'fs';
-import {promisify} from 'util';
+import { promisify } from 'util';
 
-import {KNOWN_RULESETS} from "../src/formats";
+import { KNOWN_RULESETS } from '../src/formats';
 
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
@@ -34,41 +34,32 @@ if (!fs.existsSync(baseDir)) {
 const generatedAssets = {};
 
 (async () => {
-  for (const kind of KNOWN_RULESETS.map(ruleset =>
-                                            ruleset.replace('spectral:', ''))) {
-    const assets =
-        await processDirectory(path.join(__dirname, `../rulesets/${kind}`));
+  for (const kind of KNOWN_RULESETS.map(ruleset => ruleset.replace('spectral:', ''))) {
+    const assets = await processDirectory(path.join(__dirname, `../rulesets/${kind}`));
     Object.assign(generatedAssets, assets);
-    await writeFileAsync(path.join(baseDir, `assets.${kind}.json`),
-                         JSON.stringify(assets, null, 2));
+    await writeFileAsync(path.join(baseDir, `assets.${kind}.json`), JSON.stringify(assets, null, 2));
   }
 
-  await writeFileAsync(path.join(baseDir, `assets.json`),
-                       JSON.stringify(generatedAssets, null, 2));
+  await writeFileAsync(path.join(baseDir, `assets.json`), JSON.stringify(generatedAssets, null, 2));
 })();
 
-async function _processDirectory(assets: Record<string, string>,
-                                 dir: string): Promise<void> {
+async function _processDirectory(assets: Record<string, string>, dir: string): Promise<void> {
   await Promise.all(
-      (await readdirAsync(dir)).map(async (name: string) => {
-        if ([ 'schemas', '__tests__' ].includes(name))
-          return;
-        const target = path.join(dir, name);
-        const stats = await statAsync(target);
-        if (stats.isDirectory()) {
-          return _processDirectory(assets, target);
-        } else {
-          let content = await readFileAsync(target, 'utf8');
-          if (path.extname(name) === '.json') {
-            content = JSON.stringify(
-                await $RefParser.bundle(target, JSON.parse(content), {}))
-          }
-
-          assets[path.join('@stoplight/spectral',
-                           path.relative(path.join(__dirname, '..'), target))] =
-              content;
+    (await readdirAsync(dir)).map(async (name: string) => {
+      if (['schemas', '__tests__'].includes(name)) return;
+      const target = path.join(dir, name);
+      const stats = await statAsync(target);
+      if (stats.isDirectory()) {
+        return _processDirectory(assets, target);
+      } else {
+        let content = await readFileAsync(target, 'utf8');
+        if (path.extname(name) === '.json') {
+          content = JSON.stringify(await $RefParser.bundle(target, JSON.parse(content), {}));
         }
-      }),
+
+        assets[path.join('@stoplight/spectral', path.relative(path.join(__dirname, '..'), target))] = content;
+      }
+    }),
   );
 }
 

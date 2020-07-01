@@ -2,7 +2,7 @@
 
 import * as yargs from 'yargs';
 
-import {DEFAULT_REQUEST_OPTIONS} from '../request';
+import { DEFAULT_REQUEST_OPTIONS } from '../request';
 import lintCommand from './commands/lint';
 
 if (process.env.PROXY) {
@@ -11,14 +11,14 @@ if (process.env.PROXY) {
   DEFAULT_REQUEST_OPTIONS.agent = new ProxyAgent(process.env.PROXY);
 }
 
-export default yargs.scriptName('spectral')
-    .parserConfiguration({
-      'camel-case-expansion' : true,
-    })
-    .version()
-    .help(true)
-    .strict()
-    .wrap(yargs.terminalWidth())
-    .command(lintCommand)
-    .demandCommand(1, '')
-    .argv;
+export default yargs
+  .scriptName('spectral')
+  .parserConfiguration({
+    'camel-case-expansion': true,
+  })
+  .version()
+  .help(true)
+  .strict()
+  .wrap(yargs.terminalWidth())
+  .command(lintCommand)
+  .demandCommand(1, '').argv;

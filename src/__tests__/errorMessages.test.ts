@@ -1,97 +1,97 @@
-import {cloneDeep} from 'lodash';
-import {formatParserDiagnostics} from '../errorMessages';
+import { cloneDeep } from 'lodash';
+import { formatParserDiagnostics } from '../errorMessages';
 
 describe('Error messages', () => {
   describe('parser diagnostics', () => {
     it('prettifies JSON diagnostics', () => {
       const diagnostics = [
         {
-          range : {
-            start : {
-              line : 0,
-              character : 12,
+          range: {
+            start: {
+              line: 0,
+              character: 12,
             },
-            end : {
-              line : 0,
-              character : 17,
+            end: {
+              line: 0,
+              character: 17,
             },
           },
-          path : [ 'test' ],
-          message : 'DuplicateKey',
-          severity : 0,
-          code : 20,
+          path: ['test'],
+          message: 'DuplicateKey',
+          severity: 0,
+          code: 20,
         },
         {
-          range : {
-            start : {
-              line : 0,
-              character : 24,
+          range: {
+            start: {
+              line: 0,
+              character: 24,
             },
-            end : {
-              line : 0,
-              character : 25,
+            end: {
+              line: 0,
+              character: 25,
             },
           },
-          message : 'PropertyNameExpected',
-          severity : 0,
-          code : 3,
+          message: 'PropertyNameExpected',
+          severity: 0,
+          code: 3,
         },
         {
-          range : {
-            start : {
-              line : 0,
-              character : 24,
+          range: {
+            start: {
+              line: 0,
+              character: 24,
             },
-            end : {
-              line : 0,
-              character : 25,
+            end: {
+              line: 0,
+              character: 25,
             },
           },
-          message : 'ValueExpected',
-          severity : 0,
-          code : 4,
+          message: 'ValueExpected',
+          severity: 0,
+          code: 4,
         },
         {
-          range : {
-            start : {
-              line : 0,
-              character : 27,
+          range: {
+            start: {
+              line: 0,
+              character: 27,
             },
-            end : {
-              line : 0,
-              character : 28,
+            end: {
+              line: 0,
+              character: 28,
             },
           },
-          message : 'EndOfFileExpected',
-          severity : 0,
-          code : 9,
+          message: 'EndOfFileExpected',
+          severity: 0,
+          code: 9,
         },
       ];
 
       expect(formatParserDiagnostics(cloneDeep(diagnostics), null)).toEqual([
         {
           ...diagnostics[0],
-          path : [ 'test' ],
-          message : 'Duplicate key: test',
-          code : 'parser',
+          path: ['test'],
+          message: 'Duplicate key: test',
+          code: 'parser',
         },
         {
           ...diagnostics[1],
-          path : [],
-          message : 'Property name expected',
-          code : 'parser',
+          path: [],
+          message: 'Property name expected',
+          code: 'parser',
         },
         {
           ...diagnostics[2],
-          path : [],
-          message : 'Value expected',
-          code : 'parser',
+          path: [],
+          message: 'Value expected',
+          code: 'parser',
         },
         {
           ...diagnostics[3],
-          path : [],
-          message : 'End of file expected',
-          code : 'parser',
+          path: [],
+          message: 'End of file expected',
+          code: 'parser',
         },
       ]);
     });
@@ -99,47 +99,47 @@ describe('Error messages', () => {
     it('prettifies YAML diagnostics', () => {
       const diagnostics = [
         {
-          code : 'YAMLException',
-          message : 'expected a single document in the stream, but found more',
-          severity : 0,
-          range : {
-            start : {
-              line : 0,
-              character : 0,
+          code: 'YAMLException',
+          message: 'expected a single document in the stream, but found more',
+          severity: 0,
+          range: {
+            start: {
+              line: 0,
+              character: 0,
             },
-            end : {
-              line : 0,
-              character : 0,
-            },
-          },
-        },
-        {
-          code : 'YAMLException',
-          message : 'end of the stream or a document separator is expected',
-          severity : 0,
-          range : {
-            start : {
-              line : 1,
-              character : 5,
-            },
-            end : {
-              line : 1,
-              character : 5,
+            end: {
+              line: 0,
+              character: 0,
             },
           },
         },
         {
-          code : 'YAMLException',
-          message : 'unknown tag <tag:yaml.org,2002:2>',
-          severity : 0,
-          range : {
-            start : {
-              line : 2,
-              character : 3,
+          code: 'YAMLException',
+          message: 'end of the stream or a document separator is expected',
+          severity: 0,
+          range: {
+            start: {
+              line: 1,
+              character: 5,
             },
-            end : {
-              line : 2,
-              character : 6,
+            end: {
+              line: 1,
+              character: 5,
+            },
+          },
+        },
+        {
+          code: 'YAMLException',
+          message: 'unknown tag <tag:yaml.org,2002:2>',
+          severity: 0,
+          range: {
+            start: {
+              line: 2,
+              character: 3,
+            },
+            end: {
+              line: 2,
+              character: 6,
             },
           },
         },
@@ -148,21 +148,21 @@ describe('Error messages', () => {
       expect(formatParserDiagnostics(cloneDeep(diagnostics), null)).toEqual([
         {
           ...diagnostics[0],
-          path : [],
-          message : 'Expected a single document in the stream, but found more',
-          code : 'parser',
+          path: [],
+          message: 'Expected a single document in the stream, but found more',
+          code: 'parser',
         },
         {
           ...diagnostics[1],
-          path : [],
-          message : 'End of the stream or a document separator is expected',
-          code : 'parser',
+          path: [],
+          message: 'End of the stream or a document separator is expected',
+          code: 'parser',
         },
         {
           ...diagnostics[2],
-          path : [],
-          message : 'Unknown tag <tag:yaml.org,2002:2>',
-          code : 'parser',
+          path: [],
+          message: 'Unknown tag <tag:yaml.org,2002:2>',
+          code: 'parser',
         },
       ]);
     });

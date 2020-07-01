@@ -23,28 +23,21 @@
  * @author Sindre Sorhus
  */
 
-import {DiagnosticSeverity, IRange} from '@stoplight/types';
+import { DiagnosticSeverity, IRange } from '@stoplight/types';
 import * as chalk from 'chalk';
 import stripAnsi = require('strip-ansi');
 import * as table from 'text-table';
 
-import {IRuleResult} from '../types';
-import {Formatter} from './types';
-import {
-  getColorForSeverity,
-  getHighestSeverity,
-  getSeverityName,
-  getSummary,
-  groupBySource
-} from './utils';
+import { IRuleResult } from '../types';
+import { Formatter } from './types';
+import { getColorForSeverity, getHighestSeverity, getSeverityName, getSummary, groupBySource } from './utils';
 
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
 
 function formatRange(range?: IRange): string {
-  if (!range)
-    return '';
+  if (!range) return '';
 
   return ` ${range.start.line + 1}:${range.start.character + 1}`;
 }
@@ -78,18 +71,17 @@ export const stylish: Formatter = results => {
       result.message,
     ]);
 
-    output += `${
-        table(pathTableData, {
-          align : [ 'c', 'r', 'l' ],
-          stringLength(str) { return stripAnsi(str).length; },
-        })
-            .split('\n')
-            .map(
-                (el: string) => el.replace(
-                    /(\d+)\s+(\d+)/u, (m: string, p1: string, p2: string) =>
-                                          chalk.dim(`${p1}:${p2}`)),
-                )
-            .join('\n')}\n\n`;
+    output += `${table(pathTableData, {
+      align: ['c', 'r', 'l'],
+      stringLength(str) {
+        return stripAnsi(str).length;
+      },
+    })
+      .split('\n')
+      .map((el: string) =>
+        el.replace(/(\d+)\s+(\d+)/u, (m: string, p1: string, p2: string) => chalk.dim(`${p1}:${p2}`)),
+      )
+      .join('\n')}\n\n`;
   });
 
   if (summaryText === null) {

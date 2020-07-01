@@ -1,4 +1,4 @@
-import {JsonPath} from '@stoplight/types';
+import { JsonPath } from '@stoplight/types';
 
 export const arePathsEqual = (one: JsonPath, another: JsonPath): boolean => {
   if (one.length !== another.length) {

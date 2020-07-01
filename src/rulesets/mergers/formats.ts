@@ -1,4 +1,4 @@
-import {RuleCollection} from '../../types';
+import { RuleCollection } from '../../types';
 
 export function mergeFormats(rules: RuleCollection, formats: string[]): void {
   if (formats.length > 0) {

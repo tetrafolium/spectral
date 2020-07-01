@@ -1,16 +1,15 @@
-import {Document, STDIN} from '../../../document';
-import {KNOWN_FORMATS} from '../../../formats';
-import {readParsable} from '../../../fs/reader';
+import { Document, STDIN } from '../../../document';
+import { KNOWN_FORMATS } from '../../../formats';
+import { readParsable } from '../../../fs/reader';
 import * as Parsers from '../../../parsers';
-import {IRuleResult, Spectral} from '../../../spectral';
-import {ILintConfig} from '../../../types/config';
-import {getRuleset, listFiles, skipRules} from './utils';
-import {getResolver} from './utils/getResolver';
+import { IRuleResult, Spectral } from '../../../spectral';
+import { ILintConfig } from '../../../types/config';
+import { getRuleset, listFiles, skipRules } from './utils';
+import { getResolver } from './utils/getResolver';
 
-export async function lint(documents: Array<number|string>,
-                           flags: ILintConfig) {
+export async function lint(documents: Array<number | string>, flags: ILintConfig) {
   const spectral = new Spectral({
-    resolver : getResolver(flags.resolver),
+    resolver: getResolver(flags.resolver),
   });
 
   const ruleset = await getRuleset(flags.ruleset);
@@ -33,8 +32,7 @@ export async function lint(documents: Array<number|string>,
   if (flags.verbose) {
     if (ruleset) {
       const rules = Object.values(spectral.rules);
-      console.info(`Found ${rules.length} rules (${
-          rules.filter(rule => rule.enabled).length} enabled)`);
+      console.info(`Found ${rules.length} rules (${rules.filter(rule => rule.enabled).length} enabled)`);
     } else {
       console.info('No rules loaded, attempting to detect document type');
     }
@@ -44,8 +42,7 @@ export async function lint(documents: Array<number|string>,
     spectral.setRules(skipRules(ruleset.rules, flags));
   }
 
-  const [targetUris, unmatchedPatterns] =
-      await listFiles(documents, !flags.showUnmatchedGlobs);
+  const [targetUris, unmatchedPatterns] = await listFiles(documents, !flags.showUnmatchedGlobs);
   const results: IRuleResult[] = [];
 
   for (const unmatchedPattern of unmatchedPatterns) {
@@ -58,18 +55,18 @@ export async function lint(documents: Array<number|string>,
     }
 
     const document = new Document(
-        await readParsable(targetUri, {encoding : flags.encoding}),
-        Parsers.Yaml,
-        typeof targetUri === 'number' ? STDIN : targetUri,
+      await readParsable(targetUri, { encoding: flags.encoding }),
+      Parsers.Yaml,
+      typeof targetUri === 'number' ? STDIN : targetUri,
     );
 
     results.push(
-        ...(await spectral.run(document, {
-          ignoreUnknownFormat : flags.ignoreUnknownFormat,
-          resolve : {
-            documentUri : typeof targetUri === 'number' ? void 0 : targetUri,
-          },
-        })),
+      ...(await spectral.run(document, {
+        ignoreUnknownFormat: flags.ignoreUnknownFormat,
+        resolve: {
+          documentUri: typeof targetUri === 'number' ? void 0 : targetUri,
+        },
+      })),
     );
   }
 

@@ -1,8 +1,10 @@
 # OpenAPI Rules
 
-Spectral has a built-in "oas" ruleset, with OAS being shorthand for the [OpenAPI Specification](https://openapis.org/specification).
+Spectral has a built-in "oas" ruleset, with OAS being shorthand for the
+[OpenAPI Specification](https://openapis.org/specification).
 
-In your ruleset file you can add `extends: "spectral:oas"` and you'll get all of the following rules applied, depending on the appropriate OpenAPI version used (detected through [formats](../getting-started/rulesets.md#formats)).
+In your ruleset file you can add `extends: "spectral:oas"` and you'll get all of the following rules applied, depending
+on the appropriate OpenAPI version used (detected through [formats](../getting-started/rulesets.md#formats)).
 
 ## OpenAPI v2 & v3
 
@@ -10,7 +12,9 @@ These rules apply to both OpenAPI v2 and v3.
 
 ### operation-2xx-response
 
-Operation must have at least one `2xx` response. Any API operation (endpoint) can fail but presumably it is also meant to do something constructive at some point. If you forget to write out a success case for this API, then this rule will let you know.
+Operation must have at least one `2xx` response. Any API operation (endpoint) can fail but presumably it is also meant
+to do something constructive at some point. If you forget to write out a success case for this API, then this rule will
+let you know.
 
 **Recommended:** Yes
 
@@ -29,7 +33,8 @@ paths:
 
 Every operation must have a unique `operationId`.
 
-Why? A lot of documentation systems use this as an identifier, some SDK generators convert them to a method name, all sorts of things like that.
+Why? A lot of documentation systems use this as an identifier, some SDK generators convert them to a method name, all
+sorts of things like that.
 
 **Recommended:** Yes
 
@@ -39,12 +44,12 @@ Why? A lot of documentation systems use this as an identifier, some SDK generato
 paths:
   /pet:
     patch:
-      operationId: "update-pet"
+      operationId: 'update-pet'
       responses:
         200:
           description: ok
     put:
-      operationId: "update-pet"
+      operationId: 'update-pet'
       responses:
         200:
           description: ok
@@ -56,12 +61,12 @@ paths:
 paths:
   /pet:
     patch:
-      operationId: "update-pet"
+      operationId: 'update-pet'
       responses:
         200:
           description: ok
     put:
-      operationId: "replace-pet"
+      operationId: 'replace-pet'
       responses:
         200:
           description: ok
@@ -90,20 +95,23 @@ Path parameters are correct and valid.
 
 ### contact-properties
 
-The [info-contact](#info-contact) rule will ask you to put in a contact object, and this rule will make sure it's full of the most useful properties: `name`, `url` and `email`.
+The [info-contact](#info-contact) rule will ask you to put in a contact object, and this rule will make sure it's full
+of the most useful properties: `name`, `url` and `email`.
 
-Putting in the name of the developer/team/department/company responsible for the API, along with the support email and help-desk/GitHub Issues/whatever URL means people know where to go for help. This can mean more money in the bank, instead of developers just wandering off or complaining online.
+Putting in the name of the developer/team/department/company responsible for the API, along with the support email and
+help-desk/GitHub Issues/whatever URL means people know where to go for help. This can mean more money in the bank,
+instead of developers just wandering off or complaining online.
 
 **Recommended:** No
 
 **Good Example**
 
 ```yaml
-openapi: "3.0.2"
+openapi: '3.0.2'
 info:
   title: Awesome API
   description: A very well defined API
-  version: "1.0"
+  version: '1.0'
   contact:
     name: A-Team
     email: a-team@goarmy.com
@@ -114,17 +122,18 @@ info:
 
 Info object should contain `contact` object.
 
-Hopefully your API description document is so good that nobody ever needs to contact you with questions, but that is rarely the case. The contact object has a few different options for contact details.
+Hopefully your API description document is so good that nobody ever needs to contact you with questions, but that is
+rarely the case. The contact object has a few different options for contact details.
 
 **Recommended:** Yes
 
 **Good Example**
 
 ```yaml
-openapi: "3.0.2"
+openapi: '3.0.2'
 info:
   title: Awesome API
-  version: "1.0"
+  version: '1.0'
   contact:
     name: A-Team
     email: a-team@goarmy.com
@@ -134,7 +143,8 @@ info:
 
 OpenAPI object info `description` must be present and non-empty string.
 
-Examples can contain Markdown so you can really go to town with them, implementing getting started information like where to find authentication keys, and how to use them.
+Examples can contain Markdown so you can really go to town with them, implementing getting started information like
+where to find authentication keys, and how to use them.
 
 **Recommended:** Yes
 
@@ -146,7 +156,8 @@ info:
   version: '1.0.0'
   title: Descriptive API
   description: >+
-    Some description about the general point of this API, and why it exists when another similar but different API also exists.
+    Some description about the general point of this API, and why it exists when another similar but different API also
+    exists.
 
     ## Authentication
 
@@ -157,7 +168,8 @@ info:
 
 The `info` object should have a `license` key.
 
-It can be hard to pick a license, so if you don't have a lawyer around you can use [TLDRLegal](https://tldrlegal.com/) and [Choose a License](https://choosealicense.com/) to help give you an idea.
+It can be hard to pick a license, so if you don't have a lawyer around you can use [TLDRLegal](https://tldrlegal.com/)
+and [Choose a License](https://choosealicense.com/) to help give you an idea.
 
 How useful this is in court is not entirely known, but having a license is better than not having a license.
 
@@ -166,7 +178,7 @@ How useful this is in court is not entirely known, but having a license is bette
 **Good Example**
 
 ```yaml
-openapi: "3.0.2"
+openapi: '3.0.2'
 info:
   license:
     name: MIT
@@ -174,14 +186,15 @@ info:
 
 ### license-url
 
-Mentioning a license is only useful if people know what the license means, so add a link to the full text for those who need it.
+Mentioning a license is only useful if people know what the license means, so add a link to the full text for those who
+need it.
 
 **Recommended:** Yes
 
 **Good Example**
 
 ```yaml
-openapi: "3.0.2"
+openapi: '3.0.2'
 info:
   license:
     name: MIT
@@ -190,7 +203,9 @@ info:
 
 ### no-eval-in-markdown
 
-This rule protects against an edge case, for anyone bringing in description documents from third parties and using the parsed content rendered in HTML/JS. If one of those third parties does something shady like inject `eval()` JavaScript statements, it could lead to an XSS attack.
+This rule protects against an edge case, for anyone bringing in description documents from third parties and using the
+parsed content rendered in HTML/JS. If one of those third parties does something shady like inject `eval()` JavaScript
+statements, it could lead to an XSS attack.
 
 **Recommended:** Yes
 
@@ -204,7 +219,10 @@ info:
 
 ### no-script-tags-in-markdown
 
-This rule protects against a potential hack, for anyone bringing in description documents from third parties then generating HTML documentation. If one of those third parties does something shady like inject `<script>` tags, they could easily execute arbitrary code on your domain, which if it's the same as your main application could be all sorts of terrible.
+This rule protects against a potential hack, for anyone bringing in description documents from third parties then
+generating HTML documentation. If one of those third parties does something shady like inject `<script>` tags, they
+could easily execute arbitrary code on your domain, which if it's the same as your main application could be all sorts
+of terrible.
 
 **Recommended:** Yes
 
@@ -248,10 +266,11 @@ Why? Well, you _can_ reference tags arbitrarily in operations, and definition is
 /invoices/{id}/items:
   get:
     tags:
-    - Invoice Items
+      - Invoice Items
 ```
 
-Defining tags allows you to add more information like a `description`. For more information see [tag-description](#tag-description).
+Defining tags allows you to add more information like a `description`. For more information see
+[tag-description](#tag-description).
 
 **Recommended:** Yes
 
@@ -265,15 +284,19 @@ Defining tags allows you to add more information like a `description`. For more 
 
 ### operation-operationId
 
-This operation ID is essentially a reference for the operation, which can be used to visually suggest a connection to other operations. This is like some theoretical static HATEOAS-style referencing, but it's also used for the URL in some documentation systems.
+This operation ID is essentially a reference for the operation, which can be used to visually suggest a connection to
+other operations. This is like some theoretical static HATEOAS-style referencing, but it's also used for the URL in some
+documentation systems.
 
-Make the value `lower-hyphen-case`, and try and think of a name for the action which does not relate to the HTTP message. Base it off the actual action being performed. `create-polygon`? `search-by-polygon`? `filter-companies`?
+Make the value `lower-hyphen-case`, and try and think of a name for the action which does not relate to the HTTP
+message. Base it off the actual action being performed. `create-polygon`? `search-by-polygon`? `filter-companies`?
 
 **Recommended:** Yes
 
 ### operation-operationId-valid-in-url
 
-Seeing as operationId is often used for unique URLs in documentation systems, it's a good idea to avoid non-URL safe characters.
+Seeing as operationId is often used for unique URLs in documentation systems, it's a good idea to avoid non-URL safe
+characters.
 
 **Recommended:** Yes
 
@@ -288,16 +311,20 @@ paths:
 
 ### operation-singular-tag
 
-Use just one tag for an operation, which is helpful for some documentation systems which use tags to avoid duplicate content.
+Use just one tag for an operation, which is helpful for some documentation systems which use tags to avoid duplicate
+content.
 
 **Recommended:** No
 
 ### operation-summary-formatted
 
 <!-- theme: warning -->
+
 > ### Removed in v5.0
 >
-> This rule was removed in Spectral v5.0, so if you are relying on it you can find the [old definition here](https://github.com/stoplightio/spectral/blob/v4.2.0/src/rulesets/oas/index.json#L312) and paste it into your [custom ruleset](../getting-started/rulesets.md).
+> This rule was removed in Spectral v5.0, so if you are relying on it you can find the
+> [old definition here](https://github.com/stoplightio/spectral/blob/v4.2.0/src/rulesets/oas/index.json#L312) and paste
+> it into your [custom ruleset](../getting-started/rulesets.md).
 
 Operation `summary` should start with upper case and end with a dot.
 
@@ -323,7 +350,11 @@ Path parameter declarations cannot be empty, ex.`/given/{}` is invalid.
 
 ### path-keys-no-trailing-slash
 
-Keep trailing slashes off of paths, as it can cause some confusion. Some web tooling (like mock servers, real servers, code generators, application frameworks, etc.) will treat `example.com/foo` and `example.com/foo/` as the same thing, but other tooling will not. Avoid any confusion by just documenting them without the slash, and maybe some tooling will let people shove a / on there when they're using it or maybe not, but at least the docs are suggesting how it should be done properly.
+Keep trailing slashes off of paths, as it can cause some confusion. Some web tooling (like mock servers, real servers,
+code generators, application frameworks, etc.) will treat `example.com/foo` and `example.com/foo/` as the same thing,
+but other tooling will not. Avoid any confusion by just documenting them without the slash, and maybe some tooling will
+let people shove a / on there when they're using it or maybe not, but at least the docs are suggesting how it should be
+done properly.
 
 **Recommended:** Yes
 
@@ -345,7 +376,9 @@ tags:
     description: Angry short-legged omnivores.
 ```
 
-If your tags are business objects then you can use the term to explain them a bit. An 'Account' could be a user account, company information, bank account, potential sales lead, anything. What is clear to the folks writing the document is probably not as clear to others.
+If your tags are business objects then you can use the term to explain them a bit. An 'Account' could be a user account,
+company information, bank account, potential sales lead, anything. What is clear to the folks writing the document is
+probably not as clear to others.
 
 ```yaml
 tags:
@@ -400,7 +433,8 @@ These rules will only apply to OpenAPI v2.0 documents.
 
 ### oas2-operation-formData-consume-check
 
-Operations with an `in: formData` parameter must include `application/x-www-form-urlencoded` or `multipart/form-data` in their `consumes` property.
+Operations with an `in: formData` parameter must include `application/x-www-form-urlencoded` or `multipart/form-data` in
+their `consumes` property.
 
 **Recommended:** Yes
 
@@ -430,8 +464,8 @@ Server URL should not have a trailing slash.
 
 ### oas2-operation-security-defined
 
-Operation `security` values must match a scheme defined in the `securityDefinitions` object.
-Ignores empty `security` values for cases where authentication is explicitly not required or optional.
+Operation `security` values must match a scheme defined in the `securityDefinitions` object. Ignores empty `security`
+values for cases where authentication is explicitly not required or optional.
 
 **Recommended:** Yes
 
@@ -439,9 +473,8 @@ Ignores empty `security` values for cases where authentication is explicitly not
 
 Potential unused reusable `definition` entry has been detected.
 
-_Warning:_ This rule may identify false positives when linting a specification
-that acts as a library (a container storing reusable objects, leveraged by other
-specifications that reference those objects).
+_Warning:_ This rule may identify false positives when linting a specification that acts as a library (a container
+storing reusable objects, leveraged by other specifications that reference those objects).
 
 **Recommended:** Yes
 
@@ -485,9 +518,10 @@ OpenAPI `servers` must be present and non-empty array.
 
 **Recommended:** Yes
 
-Share links to any and all servers that people might care about. If this is going to be given to internal people then usually that is localhost (so they know the right port number), staging, and production.
+Share links to any and all servers that people might care about. If this is going to be given to internal people then
+usually that is localhost (so they know the right port number), staging, and production.
 
-``` yaml
+```yaml
 servers:
   - url: https://example.com/api
     description: Production server
@@ -511,14 +545,14 @@ Examples for `requestBody` or response examples can have an `externalValue` or a
 paths:
   /pet:
     put:
-      operationId: "replace-pet"
+      operationId: 'replace-pet'
       requestBody:
         content:
           'application/json':
             examples:
               foo:
                 summary: A foo example
-                value: {"foo": "bar"}
+                value: { 'foo': 'bar' }
                 externalValue: 'http://example.org/foo.json'
                 # marp! no, can only have one or the other
 ```
@@ -537,7 +571,7 @@ Server URL should not point at example.com.
 
 **Bad Example**
 
-``` yaml
+```yaml
 servers:
   - url: https://example.com/api
     description: Production server
@@ -553,13 +587,14 @@ We have example.com for documentation purposes here, but you should put in actua
 
 Server URL should not have a trailing slash.
 
-Some tooling forgets to strip trailing slashes off when it's joining the `servers.url` with `paths`, and you can get awkward URLs like `https://example.com/api//pets`. Best to just strip them off yourself.
+Some tooling forgets to strip trailing slashes off when it's joining the `servers.url` with `paths`, and you can get
+awkward URLs like `https://example.com/api//pets`. Best to just strip them off yourself.
 
 **Recommended:** Yes
 
 **Good Example**
 
-``` yaml
+```yaml
 servers:
   - url: https://example.com
   - url: https://example.com/api
@@ -567,7 +602,7 @@ servers:
 
 **Bad Example**
 
-``` yaml
+```yaml
 servers:
   - url: https://example.com/
   - url: https://example.com/api/
@@ -577,9 +612,8 @@ servers:
 
 Potential unused reusable `schema` entry has been detected.
 
-_Warning:_ This rule may identify false positives when linting a specification
-that acts as a library (a container storing reusable objects, leveraged by other
-specifications that reference those objects).
+_Warning:_ This rule may identify false positives when linting a specification that acts as a library (a container
+storing reusable objects, leveraged by other specifications that reference those objects).
 
 **Recommended:** Yes
 

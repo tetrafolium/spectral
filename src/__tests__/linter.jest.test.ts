@@ -1,32 +1,30 @@
-import {normalize} from '@stoplight/path';
-import {DiagnosticSeverity} from '@stoplight/types';
+import { normalize } from '@stoplight/path';
+import { DiagnosticSeverity } from '@stoplight/types';
 import * as fs from 'fs';
 import * as nock from 'nock';
 import * as path from 'path';
 import * as timers from 'timers';
 
-import {isOpenApiv3} from '../formats';
-import {functions} from '../functions';
-import {httpAndFileResolver} from '../resolvers/http-and-file';
-import {readRuleset} from '../rulesets';
-import {setFunctionContext} from '../rulesets/evaluators';
+import { isOpenApiv3 } from '../formats';
+import { functions } from '../functions';
+import { httpAndFileResolver } from '../resolvers/http-and-file';
+import { readRuleset } from '../rulesets';
+import { setFunctionContext } from '../rulesets/evaluators';
 import oasDocumentSchema from '../rulesets/oas/functions/oasDocumentSchema';
-import {IFunctionResult, Spectral} from '../spectral';
-import {IRuleset, RulesetExceptionCollection} from '../types/ruleset';
+import { IFunctionResult, Spectral } from '../spectral';
+import { IRuleset, RulesetExceptionCollection } from '../types/ruleset';
 
-const customFunctionOASRuleset =
-    path.join(__dirname, './__fixtures__/custom-functions-oas-ruleset.json');
-const customOASRuleset =
-    path.join(__dirname, './__fixtures__/custom-oas-ruleset.json');
-const customDirectoryFunctionsRuleset = path.join(
-    __dirname, './__fixtures__/custom-directory-function-ruleset.json');
-const recommendedRulesetPath =
-    path.join(__dirname, './__fixtures__/recommended-ruleset.json');
+const customFunctionOASRuleset = path.join(__dirname, './__fixtures__/custom-functions-oas-ruleset.json');
+const customOASRuleset = path.join(__dirname, './__fixtures__/custom-oas-ruleset.json');
+const customDirectoryFunctionsRuleset = path.join(__dirname, './__fixtures__/custom-directory-function-ruleset.json');
+const recommendedRulesetPath = path.join(__dirname, './__fixtures__/recommended-ruleset.json');
 
 describe('Linter', () => {
   let spectral: Spectral;
 
-  beforeEach(() => { spectral = new Spectral(); });
+  beforeEach(() => {
+    spectral = new Spectral();
+  });
 
   afterEach(() => {
     jest.restoreAllMocks();
@@ -37,8 +35,8 @@ describe('Linter', () => {
     await spectral.loadRuleset(customFunctionOASRuleset);
     expect(await spectral.run({})).toEqual([
       expect.objectContaining({
-        code : 'has-info-property',
-        message : 'info property is missing',
+        code: 'has-info-property',
+        message: 'info property is missing',
       }),
     ]);
   });
@@ -46,72 +44,67 @@ describe('Linter', () => {
   it('should prefer custom functions over the built-in ones', async () => {
     await spectral.loadRuleset(customFunctionOASRuleset);
     expect(
-        await spectral.run({
-          info : {
-            contact : true,
-          },
-        }),
-        )
-        .toEqual([]);
+      await spectral.run({
+        info: {
+          contact: true,
+        },
+      }),
+    ).toEqual([]);
 
     // this is an actual for difference between the built-in ruleset and the
     // custon one
 
     expect(
-        await spectral.run({
-          info : {
-            contact : 1,
-          },
-        }),
-        )
-        .toEqual([
-          expect.objectContaining({
-            code : 'true-info-contact',
-          }),
-        ]);
+      await spectral.run({
+        info: {
+          contact: 1,
+        },
+      }),
+    ).toEqual([
+      expect.objectContaining({
+        code: 'true-info-contact',
+      }),
+    ]);
   });
 
-  it('should not run function if provided data does not match defined schema',
-     async () => {
-       await spectral.loadRuleset(customFunctionOASRuleset);
-       expect(await spectral.run({}))
-           .toEqual(
-               expect.not.arrayContaining([
-                 // has-info-property-invalid is not executed
-                 expect.objectContaining({
-                   code : 'has-info-property-invalid',
-                 }),
-               ]),
-           );
-     });
+  it('should not run function if provided data does not match defined schema', async () => {
+    await spectral.loadRuleset(customFunctionOASRuleset);
+    expect(await spectral.run({})).toEqual(
+      expect.not.arrayContaining([
+        // has-info-property-invalid is not executed
+        expect.objectContaining({
+          code: 'has-info-property-invalid',
+        }),
+      ]),
+    );
+  });
 
   describe('custom functions', () => {
     it('should have access to function-live lifespan cache', async () => {
-      const logSpy =
-          jest.spyOn(global.console, 'log').mockImplementation(Function);
+      const logSpy = jest.spyOn(global.console, 'log').mockImplementation(Function);
 
       spectral.setRuleset({
-        exceptions : {},
-        rules : {
-          foo : {
-            given : '$',
-            then : {
-              function : 'fn',
+        exceptions: {},
+        rules: {
+          foo: {
+            given: '$',
+            then: {
+              function: 'fn',
             },
           },
-          bar : {
-            given : '$',
-            then : {
-              function : 'fn',
+          bar: {
+            given: '$',
+            then: {
+              function: 'fn',
             },
           },
         },
-        functions : {
-          fn : {
-            source : null,
-            name : 'fn',
-            schema : null,
-            code : `module.exports = function() {
+        functions: {
+          fn: {
+            source: null,
+            name: 'fn',
+            schema: null,
+            code: `module.exports = function() {
 console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 }`,
           },
@@ -130,113 +123,112 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
       expect(logSpy.mock.calls[0][0]).toBe(logSpy.mock.calls[2][0]);
     });
 
-    it('should have access to cache that is not shared among them',
-       async () => {
-         const logSpy =
-             jest.spyOn(global.console, 'log').mockImplementation(Function);
+    it('should have access to cache that is not shared among them', async () => {
+      const logSpy = jest.spyOn(global.console, 'log').mockImplementation(Function);
 
-         spectral.setRuleset({
-           exceptions : {},
-           rules : {
-             foo : {
-               given : '$',
-               then : {
-                 function : 'fn',
-               },
-             },
-             bar : {
-               given : '$',
-               then : {
-                 function : 'fn-2',
-               },
-             },
-           },
-           functions : {
-             fn : {
-               source : null,
-               name : 'fn',
-               schema : null,
-               code : `module.exports = function() {
+      spectral.setRuleset({
+        exceptions: {},
+        rules: {
+          foo: {
+            given: '$',
+            then: {
+              function: 'fn',
+            },
+          },
+          bar: {
+            given: '$',
+            then: {
+              function: 'fn-2',
+            },
+          },
+        },
+        functions: {
+          fn: {
+            source: null,
+            name: 'fn',
+            schema: null,
+            code: `module.exports = function() {
 console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 }`,
-             },
-             'fn-2' : {
-               source : null,
-               name : 'fn-2',
-               schema : null,
-               code : `module.exports = function() {
+          },
+          'fn-2': {
+            source: null,
+            name: 'fn-2',
+            schema: null,
+            code: `module.exports = function() {
 console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 }`,
-             },
-           },
-         });
+          },
+        },
+      });
 
-         await spectral.run({});
+      await spectral.run({});
 
-         // verifies whether the 2 subsequent calls **DID NOT** pass the same
-         // cache instance as the first argument
-         expect(logSpy.mock.calls[0][0]).not.toBe(logSpy.mock.calls[1][0]);
+      // verifies whether the 2 subsequent calls **DID NOT** pass the same
+      // cache instance as the first argument
+      expect(logSpy.mock.calls[0][0]).not.toBe(logSpy.mock.calls[1][0]);
 
-         await spectral.run({});
+      await spectral.run({});
 
-         // verifies whether the 2 subsequent calls **DID NOT** pass the same
-         // cache instance as the first argument
-         expect(logSpy.mock.calls[2][0]).not.toBe(logSpy.mock.calls[3][0]);
+      // verifies whether the 2 subsequent calls **DID NOT** pass the same
+      // cache instance as the first argument
+      expect(logSpy.mock.calls[2][0]).not.toBe(logSpy.mock.calls[3][0]);
 
-         // verifies whether the 2 subsequent calls to the same function passe
-         // the same cache instance as the first argument
-         expect(logSpy.mock.calls[0][0]).toBe(logSpy.mock.calls[2][0]);
-         expect(logSpy.mock.calls[1][0]).toBe(logSpy.mock.calls[3][0]);
-       });
+      // verifies whether the 2 subsequent calls to the same function passe
+      // the same cache instance as the first argument
+      expect(logSpy.mock.calls[0][0]).toBe(logSpy.mock.calls[2][0]);
+      expect(logSpy.mock.calls[1][0]).toBe(logSpy.mock.calls[3][0]);
+    });
 
     it('should support require calls', async () => {
       await spectral.loadRuleset(customFunctionOASRuleset);
       expect(
-          await spectral.run({
-            info : {},
-            paths : {},
-          }),
-          )
-          .toEqual([
-            expect.objectContaining({
-              code : 'has-bar-get-operation',
-              message : 'Object does not have undefined property',
-              path : [ 'paths' ],
-            }),
-          ]);
+        await spectral.run({
+          info: {},
+          paths: {},
+        }),
+      ).toEqual([
+        expect.objectContaining({
+          code: 'has-bar-get-operation',
+          message: 'Object does not have undefined property',
+          path: ['paths'],
+        }),
+      ]);
     });
 
     it('should be able to call any available function', async () => {
       await spectral.loadRuleset(customDirectoryFunctionsRuleset);
-      expect(await spectral.run({bar : 2}))
-          .toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({
-                  code : 'validate-bar',
-                  message : '`bar` property should be a string',
-                }),
-              ]),
-          );
+      expect(await spectral.run({ bar: 2 })).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: 'validate-bar',
+            message: '`bar` property should be a string',
+          }),
+        ]),
+      );
     });
 
     it('should be able to make a request using fetch', async () => {
-      const scope = nock('https://stoplight.io').get('/').once().reply(200);
+      const scope = nock('https://stoplight.io')
+        .get('/')
+        .once()
+        .reply(200);
 
       spectral.setRuleset({
-        exceptions : {},
-        functions : {
-          fn : {
-            source : null,
-            schema : null,
-            name : 'fn',
-            code : `module.exports = () => void fetch('https://stoplight.io')`,
+        exceptions: {},
+        functions: {
+          fn: {
+            source: null,
+            schema: null,
+            name: 'fn',
+            code: `module.exports = () => void fetch('https://stoplight.io')`,
           },
         },
-        rules : {
-          empty : {
-            given : '$',
-            then : {
-              function : 'fn',
+        rules: {
+          empty: {
+            given: '$',
+            then: {
+              function: 'fn',
             },
           },
         },
@@ -254,17 +246,19 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
         jest.useFakeTimers();
 
         spectral.setRules({
-          'async-foo' : {
-            given : '$',
-            severity : DiagnosticSeverity.Warning,
-            then : {
-              function : fnName,
+          'async-foo': {
+            given: '$',
+            severity: DiagnosticSeverity.Warning,
+            then: {
+              function: fnName,
             },
           },
         });
       });
 
-      afterEach(() => { jest.useRealTimers(); });
+      afterEach(() => {
+        jest.useRealTimers();
+      });
 
       it('should handle basic example', async () => {
         spectral.setFunctions({
@@ -272,7 +266,7 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
             return new Promise<IFunctionResult[]>(resolve => {
               setTimeout(resolve, 200, [
                 {
-                  message : 'Error reported by async fn',
+                  message: 'Error reported by async fn',
                 },
               ]);
             });
@@ -280,7 +274,7 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
         });
 
         const result = spectral.run({
-          swagger : '2.0',
+          swagger: '2.0',
         });
 
         await new Promise(timers.setImmediate);
@@ -289,11 +283,11 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 
         expect(await result).toEqual([
           {
-            code : 'async-foo',
-            message : 'Error reported by async fn',
-            path : [],
-            range : expect.any(Object),
-            severity : DiagnosticSeverity.Warning,
+            code: 'async-foo',
+            message: 'Error reported by async fn',
+            path: [],
+            range: expect.any(Object),
+            severity: DiagnosticSeverity.Warning,
           },
         ]);
       });
@@ -308,7 +302,7 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
         });
 
         const result = spectral.run({
-          swagger : '2.0',
+          swagger: '2.0',
         });
 
         await new Promise(timers.setImmediate);
@@ -320,13 +314,13 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 
       it('should be able to make actual requests', async () => {
         spectral.setRuleset({
-          exceptions : {},
-          functions : {
-            [fnName] : {
-              name : fnName,
-              schema : null,
-              source : null,
-              code : `module.exports = async function (targetVal) {
+          exceptions: {},
+          functions: {
+            [fnName]: {
+              name: fnName,
+              schema: null,
+              source: null,
+              code: `module.exports = async function (targetVal) {
   if (!this.cache.has('dictionary')) {
     const res = await fetch('https://dictionary.com/evil');
     if (res.ok) {
@@ -344,292 +338,281 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
 }`,
             },
           },
-          rules : {
-            'no-evil-words' : {
-              given : '$..*@string()',
-              severity : DiagnosticSeverity.Warning,
-              then : {
-                function : fnName,
+          rules: {
+            'no-evil-words': {
+              given: '$..*@string()',
+              severity: DiagnosticSeverity.Warning,
+              then: {
+                function: fnName,
               },
             },
           },
         });
 
         nock('https://dictionary.com')
-            .persist()
-            .get('/evil')
-            .reply(200, JSON.stringify([ 'foo', 'bar', 'baz' ]));
+          .persist()
+          .get('/evil')
+          .reply(200, JSON.stringify(['foo', 'bar', 'baz']));
 
         const results = await spectral.run({
-          swagger : '2.0',
-          info : {
-            contact : {
-              email : 'foo',
-              author : 'baz',
+          swagger: '2.0',
+          info: {
+            contact: {
+              email: 'foo',
+              author: 'baz',
             },
           },
-          paths : {
-            '/user' : {},
+          paths: {
+            '/user': {},
           },
         });
 
         expect(results).toEqual([
           {
-            code : 'no-evil-words',
-            message : '`foo` is a forbidden word.',
-            path : [ 'info', 'contact', 'email' ],
-            range : expect.any(Object),
-            severity : DiagnosticSeverity.Warning,
+            code: 'no-evil-words',
+            message: '`foo` is a forbidden word.',
+            path: ['info', 'contact', 'email'],
+            range: expect.any(Object),
+            severity: DiagnosticSeverity.Warning,
           },
           {
-            code : 'no-evil-words',
-            message : '`baz` is a forbidden word.',
-            path : [ 'info', 'contact', 'author' ],
-            range : expect.any(Object),
-            severity : DiagnosticSeverity.Warning,
+            code: 'no-evil-words',
+            message: '`baz` is a forbidden word.',
+            path: ['info', 'contact', 'author'],
+            range: expect.any(Object),
+            severity: DiagnosticSeverity.Warning,
           },
         ]);
       });
 
-      it('should be able to defer request and make it in beforeTeardown step',
-         async () => {
-           spectral.setRuleset({
-             exceptions : {},
-             functions : {
-               [fnName] : {
-                 name : fnName,
-                 schema : null,
-                 source : null,
-                 code : await fs.promises.readFile(
-                     path.join(__dirname,
-                               './__fixtures__/asyncFunctions/lifecycle.js'),
-                     'utf8',
-                     ),
-               },
-             },
-             rules : {
-               'no-evil-words' : {
-                 given : '$..*@string()',
-                 severity : DiagnosticSeverity.Warning,
-                 then : {
-                   function : fnName,
-                 },
-               },
-             },
-           });
+      it('should be able to defer request and make it in beforeTeardown step', async () => {
+        spectral.setRuleset({
+          exceptions: {},
+          functions: {
+            [fnName]: {
+              name: fnName,
+              schema: null,
+              source: null,
+              code: await fs.promises.readFile(
+                path.join(__dirname, './__fixtures__/asyncFunctions/lifecycle.js'),
+                'utf8',
+              ),
+            },
+          },
+          rules: {
+            'no-evil-words': {
+              given: '$..*@string()',
+              severity: DiagnosticSeverity.Warning,
+              then: {
+                function: fnName,
+              },
+            },
+          },
+        });
 
-           const forbiddenWords = [ 'foo', 'baz' ];
+        const forbiddenWords = ['foo', 'baz'];
 
-           nock('https://dictionary.com')
-               .get('/evil')
-               .query(query => 'words' in query)
-               .reply(uri => {
-                 const [, words] = /words=([^/&]+)$/.exec(uri)!;
-                 return [
-                   200, words.split(',').filter(
-                            word => forbiddenWords.includes(word.toLowerCase()))
-                 ];
-               });
+        nock('https://dictionary.com')
+          .get('/evil')
+          .query(query => 'words' in query)
+          .reply(uri => {
+            const [, words] = /words=([^/&]+)$/.exec(uri)!;
+            return [200, words.split(',').filter(word => forbiddenWords.includes(word.toLowerCase()))];
+          });
 
-           const results = await spectral.run({
-             swagger : '2.0',
-             info : {
-               contact : {
-                 email : 'foo',
-                 author : 'baz',
-               },
-             },
-             paths : {
-               '/user' : {},
-             },
-           });
+        const results = await spectral.run({
+          swagger: '2.0',
+          info: {
+            contact: {
+              email: 'foo',
+              author: 'baz',
+            },
+          },
+          paths: {
+            '/user': {},
+          },
+        });
 
-           expect(results).toEqual([
-             {
-               code : 'no-evil-words',
-               message : '`foo` is a forbidden word.',
-               path : [ 'info', 'contact', 'email' ],
-               range : expect.any(Object),
-               severity : DiagnosticSeverity.Warning,
-             },
-             {
-               code : 'no-evil-words',
-               message : '`baz` is a forbidden word.',
-               path : [ 'info', 'contact', 'author' ],
-               range : expect.any(Object),
-               severity : DiagnosticSeverity.Warning,
-             },
-           ]);
-         });
+        expect(results).toEqual([
+          {
+            code: 'no-evil-words',
+            message: '`foo` is a forbidden word.',
+            path: ['info', 'contact', 'email'],
+            range: expect.any(Object),
+            severity: DiagnosticSeverity.Warning,
+          },
+          {
+            code: 'no-evil-words',
+            message: '`baz` is a forbidden word.',
+            path: ['info', 'contact', 'author'],
+            range: expect.any(Object),
+            severity: DiagnosticSeverity.Warning,
+          },
+        ]);
+      });
     });
   });
 
-  it('should respect the scope of defined functions (ruleset-based)',
-     async () => {
-       await spectral.loadRuleset(customDirectoryFunctionsRuleset);
-       expect(await spectral.run({})).toEqual([
-         expect.objectContaining({
-           code : 'has-field-property',
-           message : 'Object does not have field property',
-         }),
-         expect.objectContaining({
-           code : 'has-info-property',
-           message : 'info property is missing',
-         }),
-       ]);
-     });
+  it('should respect the scope of defined functions (ruleset-based)', async () => {
+    await spectral.loadRuleset(customDirectoryFunctionsRuleset);
+    expect(await spectral.run({})).toEqual([
+      expect.objectContaining({
+        code: 'has-field-property',
+        message: 'Object does not have field property',
+      }),
+      expect.objectContaining({
+        code: 'has-info-property',
+        message: 'info property is missing',
+      }),
+    ]);
+  });
 
   it('should report resolving errors for correct files', async () => {
-    spectral = new Spectral({resolver : httpAndFileResolver});
+    spectral = new Spectral({ resolver: httpAndFileResolver });
 
     const documentUri = path.join(__dirname, './__fixtures__/schemas/doc.json');
     const result = await spectral.run(
-        {
-          $ref : './user.json',
+      {
+        $ref: './user.json',
+      },
+      {
+        ignoreUnknownFormat: true,
+        resolve: {
+          documentUri,
         },
-        {
-          ignoreUnknownFormat : true,
-          resolve : {
-            documentUri,
-          },
-        },
+      },
     );
 
     expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            code : 'invalid-ref',
-            message : `ENOENT: no such file or directory, open '${
-                path.join(documentUri, '../broken-age.yaml')}'`,
-            path : [ 'age', '$ref' ],
-            source : normalize(path.join(documentUri, '../user.json')),
-          }),
-          expect.objectContaining({
-            code : 'invalid-ref',
-            message : `ENOENT: no such file or directory, open '${
-                path.join(documentUri, '../broken-length.json')}'`,
-            path : [ 'maxLength', '$ref' ],
-            source : normalize(path.join(documentUri, '../name.json')),
-          }),
-        ]),
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'invalid-ref',
+          message: `ENOENT: no such file or directory, open '${path.join(documentUri, '../broken-age.yaml')}'`,
+          path: ['age', '$ref'],
+          source: normalize(path.join(documentUri, '../user.json')),
+        }),
+        expect.objectContaining({
+          code: 'invalid-ref',
+          message: `ENOENT: no such file or directory, open '${path.join(documentUri, '../broken-length.json')}'`,
+          path: ['maxLength', '$ref'],
+          source: normalize(path.join(documentUri, '../name.json')),
+        }),
+      ]),
     );
   });
 
   describe('evaluate "value" in validation messages', () => {
     test('should print correct values for referenced files', async () => {
-      spectral = new Spectral({resolver : httpAndFileResolver});
+      spectral = new Spectral({ resolver: httpAndFileResolver });
 
       spectral.setRules({
-        'empty-is-falsy' : {
-          severity : DiagnosticSeverity.Error,
-          recommended : true,
-          description : 'Should be falsy',
-          message : 'Value {{value|to-string}} should be falsy',
-          given : '$..empty',
-          then : {
-            function : 'falsy',
+        'empty-is-falsy': {
+          severity: DiagnosticSeverity.Error,
+          recommended: true,
+          description: 'Should be falsy',
+          message: 'Value {{value|to-string}} should be falsy',
+          given: '$..empty',
+          then: {
+            function: 'falsy',
           },
         },
       });
 
       return expect(
-                 spectral.run(
-                     {
-                       empty : {
-                         $ref :
-                             './__fixtures__/petstore.merge.keys.oas3.json#/info/contact/url',
-                       },
-                       bar : {
-                         empty : {
-                           $ref : './__fixtures__/petstore.oas3.json#/servers',
-                         },
-                       },
-                       foo : {
-                         empty : {
-                           $ref : './__fixtures__/petstore.oas3.json#/info',
-                         },
-                       },
-                     },
-                     {
-                       resolve : {
-                         documentUri : path.join(__dirname, 'foo.json'),
-                       },
-                     },
-                     ),
-                 )
-          .resolves.toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({
-                  code : 'empty-is-falsy',
-                  message : 'Value "https://example.com" should be falsy',
-                  path : [ 'info', 'contact', 'url' ],
-                }),
-                expect.objectContaining({
-                  code : 'empty-is-falsy',
-                  message : 'Value Array[] should be falsy',
-                  path : [ 'servers' ],
-                }),
-                expect.objectContaining({
-                  code : 'empty-is-falsy',
-                  message : 'Value Object{} should be falsy',
-                  path : [ 'info' ],
-                }),
-              ]),
-          );
+        spectral.run(
+          {
+            empty: {
+              $ref: './__fixtures__/petstore.merge.keys.oas3.json#/info/contact/url',
+            },
+            bar: {
+              empty: {
+                $ref: './__fixtures__/petstore.oas3.json#/servers',
+              },
+            },
+            foo: {
+              empty: {
+                $ref: './__fixtures__/petstore.oas3.json#/info',
+              },
+            },
+          },
+          {
+            resolve: {
+              documentUri: path.join(__dirname, 'foo.json'),
+            },
+          },
+        ),
+      ).resolves.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: 'empty-is-falsy',
+            message: 'Value "https://example.com" should be falsy',
+            path: ['info', 'contact', 'url'],
+          }),
+          expect.objectContaining({
+            code: 'empty-is-falsy',
+            message: 'Value Array[] should be falsy',
+            path: ['servers'],
+          }),
+          expect.objectContaining({
+            code: 'empty-is-falsy',
+            message: 'Value Object{} should be falsy',
+            path: ['info'],
+          }),
+        ]),
+      );
     });
   });
 
   describe('Exceptions handling', () => {
-    it('should ignore specified rules violations in a standalone document',
-       async () => {
-         await spectral.loadRuleset(customOASRuleset);
-         spectral.registerFormat('oas3', isOpenApiv3);
+    it('should ignore specified rules violations in a standalone document', async () => {
+      await spectral.loadRuleset(customOASRuleset);
+      spectral.registerFormat('oas3', isOpenApiv3);
 
-         const res = await spectral.run(
-             {
-               openapi : '3.0.2',
-               info : 17,
-             },
-             {
-               resolve : {
-                 documentUri : '/test/file.json',
-               },
-             },
-         );
+      const res = await spectral.run(
+        {
+          openapi: '3.0.2',
+          info: 17,
+        },
+        {
+          resolve: {
+            documentUri: '/test/file.json',
+          },
+        },
+      );
 
-         expect(res.length).toBeGreaterThan(0);
+      expect(res.length).toBeGreaterThan(0);
 
-         expect(res).not.toContainEqual(
-             expect.objectContaining({
-               code : 'info-contact',
-             }),
-         );
+      expect(res).not.toContainEqual(
+        expect.objectContaining({
+          code: 'info-contact',
+        }),
+      );
 
-         expect(res).not.toContainEqual(
-             expect.objectContaining({
-               code : 'info-description',
-             }),
-         );
+      expect(res).not.toContainEqual(
+        expect.objectContaining({
+          code: 'info-description',
+        }),
+      );
 
-         expect(res).not.toContainEqual(
-             expect.objectContaining({
-               code : 'oas3-api-servers',
-             }),
-         );
-       });
+      expect(res).not.toContainEqual(
+        expect.objectContaining({
+          code: 'oas3-api-servers',
+        }),
+      );
+    });
 
     it('should not swallow results', async () => {
       // Cf. https://github.com/stoplightio/spectral/issues/1018
 
       const document = {
-        openapi : '3.0.2',
-        paths : {
-          '/a.one' : {get : 17},
-          '/a.two' : {get : 18},
-          '/a.three' : {get : 19},
-          '/b.one' : {get : 17},
-          '/b.two' : {get : 18},
-          '/b.three' : {get : 19},
+        openapi: '3.0.2',
+        paths: {
+          '/a.one': { get: 17 },
+          '/a.two': { get: 18 },
+          '/a.three': { get: 19 },
+          '/b.one': { get: 17 },
+          '/b.two': { get: 18 },
+          '/b.three': { get: 19 },
         },
       };
 
@@ -637,71 +620,70 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
       spectral.registerFormat('oas3', isOpenApiv3);
 
       const res = await spectral.run(document, {
-        resolve : {
-          documentUri : '/test/file.json',
+        resolve: {
+          documentUri: '/test/file.json',
         },
       });
 
       expect(res).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/a.one', 'get' ],
-              source : '/test/file.json',
-            }),
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/a.three', 'get' ],
-              source : '/test/file.json',
-            }),
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/b.one', 'get' ],
-              source : '/test/file.json',
-            }),
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/b.two', 'get' ],
-              source : '/test/file.json',
-            }),
-          ]),
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/a.one', 'get'],
+            source: '/test/file.json',
+          }),
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/a.three', 'get'],
+            source: '/test/file.json',
+          }),
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/b.one', 'get'],
+            source: '/test/file.json',
+          }),
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/b.two', 'get'],
+            source: '/test/file.json',
+          }),
+        ]),
       );
 
       expect(res).toEqual(
-          expect.not.arrayContaining([
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/a.two', 'get' ],
-              source : '/test/file.json',
-            }),
-          ]),
+        expect.not.arrayContaining([
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/a.two', 'get'],
+            source: '/test/file.json',
+          }),
+        ]),
       );
 
       expect(res).toEqual(
-          expect.not.arrayContaining([
-            expect.objectContaining({
-              code : 'operation-2xx-response',
-              message : 'Operation must have at least one `2xx` response.',
-              path : [ 'paths', '/b.three', 'get' ],
-              source : '/test/file.json',
-            }),
-          ]),
+        expect.not.arrayContaining([
+          expect.objectContaining({
+            code: 'operation-2xx-response',
+            message: 'Operation must have at least one `2xx` response.',
+            path: ['paths', '/b.three', 'get'],
+            source: '/test/file.json',
+          }),
+        ]),
       );
     });
 
     describe('resolving', () => {
       const document = {
-        openapi : '3.0.2',
-        components : {
-          schemas : {
-            TheLocalType : {
-              $ref :
-                  './__fixtures__/exceptions.remote.oas3.yaml#/components/schemas/TheRemoteType',
+        openapi: '3.0.2',
+        components: {
+          schemas: {
+            TheLocalType: {
+              $ref: './__fixtures__/exceptions.remote.oas3.yaml#/components/schemas/TheRemoteType',
             },
           },
         },
@@ -710,159 +692,144 @@ console.log(this.cache.get('test') || this.cache.set('test', []).get('test'));
       let testRuleset: IRuleset;
 
       beforeAll(async () => {
-        testRuleset = await readRuleset(path.join(
-            __dirname, './__fixtures__/exceptions.resolving.ruleset.json'));
+        testRuleset = await readRuleset(path.join(__dirname, './__fixtures__/exceptions.resolving.ruleset.json'));
       });
 
       const opts = {
-        resolve : {
-          documentUri : path.join(__dirname, './foo.json'),
+        resolve: {
+          documentUri: path.join(__dirname, './foo.json'),
         },
       };
 
-      const extractExceptionFrom =
-          (ruleset: IRuleset, name: string, position: number):
-              RulesetExceptionCollection => {
-                const exceptions = {};
-                const key = Object.keys(ruleset.exceptions)[position];
-                expect(ruleset.exceptions[key]).toEqual([ name ]);
-                exceptions[key] = ruleset.exceptions[key];
+      const extractExceptionFrom = (ruleset: IRuleset, name: string, position: number): RulesetExceptionCollection => {
+        const exceptions = {};
+        const key = Object.keys(ruleset.exceptions)[position];
+        expect(ruleset.exceptions[key]).toEqual([name]);
+        exceptions[key] = ruleset.exceptions[key];
 
-                return exceptions;
-              };
+        return exceptions;
+      };
 
-      it('should ignore specified rules violations in a referenced document',
-         async () => {
-           spectral = new Spectral({resolver : httpAndFileResolver});
-           spectral.registerFormat('oas3', isOpenApiv3);
+      it('should ignore specified rules violations in a referenced document', async () => {
+        spectral = new Spectral({ resolver: httpAndFileResolver });
+        spectral.registerFormat('oas3', isOpenApiv3);
 
-           const rules = {
-             'strings-maxLength' : testRuleset.rules['strings-maxLength'],
-             'oas3-schema' : {
-               ...testRuleset.rules['oas3-schema'],
-               then : {
-                 ...testRuleset.rules['oas3-schema'].then,
-                 function : 'oasDocumentSchema',
-               },
-             },
-           };
+        const rules = {
+          'strings-maxLength': testRuleset.rules['strings-maxLength'],
+          'oas3-schema': {
+            ...testRuleset.rules['oas3-schema'],
+            then: {
+              ...testRuleset.rules['oas3-schema'].then,
+              function: 'oasDocumentSchema',
+            },
+          },
+        };
 
-           spectral.setRuleset({rules, exceptions : {}, functions : {}});
-           spectral.setFunctions({
-             oasDocumentSchema :
-                 setFunctionContext({functions}, oasDocumentSchema)
-           });
+        spectral.setRuleset({ rules, exceptions: {}, functions: {} });
+        spectral.setFunctions({
+          oasDocumentSchema: setFunctionContext({ functions }, oasDocumentSchema),
+        });
 
-           const first = await spectral.run(document, opts);
+        const first = await spectral.run(document, opts);
 
-           expect(first).toEqual([
-             expect.objectContaining({
-               code : 'strings-maxLength',
-             }),
-             expect.objectContaining({
-               code : 'oas3-schema',
-             }),
-           ]);
+        expect(first).toEqual([
+          expect.objectContaining({
+            code: 'strings-maxLength',
+          }),
+          expect.objectContaining({
+            code: 'oas3-schema',
+          }),
+        ]);
 
-           const exceptions =
-               extractExceptionFrom(testRuleset, 'strings-maxLength', 0);
+        const exceptions = extractExceptionFrom(testRuleset, 'strings-maxLength', 0);
 
-           spectral.setRuleset({rules, exceptions, functions : {}});
-           spectral.setFunctions({
-             oasDocumentSchema :
-                 setFunctionContext({functions}, oasDocumentSchema)
-           });
+        spectral.setRuleset({ rules, exceptions, functions: {} });
+        spectral.setFunctions({
+          oasDocumentSchema: setFunctionContext({ functions }, oasDocumentSchema),
+        });
 
-           const second = await spectral.run(document, opts);
+        const second = await spectral.run(document, opts);
 
-           expect(second).toEqual([
-             expect.objectContaining({
-               code : 'oas3-schema',
-             }),
-           ]);
-         });
+        expect(second).toEqual([
+          expect.objectContaining({
+            code: 'oas3-schema',
+          }),
+        ]);
+      });
 
-      it('should ignore specified rules violations in "resolved=false" mode',
-         async () => {
-           spectral = new Spectral({resolver : httpAndFileResolver});
-           spectral.registerFormat('oas3', isOpenApiv3);
+      it('should ignore specified rules violations in "resolved=false" mode', async () => {
+        spectral = new Spectral({ resolver: httpAndFileResolver });
+        spectral.registerFormat('oas3', isOpenApiv3);
 
-           const rules = {
-             'no-yaml-remote-reference' :
-                 testRuleset.rules['no-yaml-remote-reference'],
-             'oas3-schema' : {
-               ...testRuleset.rules['oas3-schema'],
-               then : {
-                 ...testRuleset.rules['oas3-schema'].then,
-                 function : 'oasDocumentSchema',
-               },
-             },
-           };
+        const rules = {
+          'no-yaml-remote-reference': testRuleset.rules['no-yaml-remote-reference'],
+          'oas3-schema': {
+            ...testRuleset.rules['oas3-schema'],
+            then: {
+              ...testRuleset.rules['oas3-schema'].then,
+              function: 'oasDocumentSchema',
+            },
+          },
+        };
 
-           spectral.setRuleset({rules, exceptions : {}, functions : {}});
-           spectral.setFunctions({
-             oasDocumentSchema :
-                 setFunctionContext({functions}, oasDocumentSchema)
-           });
+        spectral.setRuleset({ rules, exceptions: {}, functions: {} });
+        spectral.setFunctions({
+          oasDocumentSchema: setFunctionContext({ functions }, oasDocumentSchema),
+        });
 
-           const first = await spectral.run(document, opts);
+        const first = await spectral.run(document, opts);
 
-           expect(first).toEqual([
-             expect.objectContaining({
-               code : 'oas3-schema',
-             }),
-             expect.objectContaining({
-               code : 'no-yaml-remote-reference',
-             }),
-           ]);
+        expect(first).toEqual([
+          expect.objectContaining({
+            code: 'oas3-schema',
+          }),
+          expect.objectContaining({
+            code: 'no-yaml-remote-reference',
+          }),
+        ]);
 
-           const exceptions =
-               extractExceptionFrom(testRuleset, 'no-yaml-remote-reference', 1);
+        const exceptions = extractExceptionFrom(testRuleset, 'no-yaml-remote-reference', 1);
 
-           spectral.setRuleset({rules, exceptions, functions : {}});
-           spectral.setFunctions({
-             oasDocumentSchema :
-                 setFunctionContext({functions}, oasDocumentSchema)
-           });
+        spectral.setRuleset({ rules, exceptions, functions: {} });
+        spectral.setFunctions({
+          oasDocumentSchema: setFunctionContext({ functions }, oasDocumentSchema),
+        });
 
-           const second = await spectral.run(document, opts);
+        const second = await spectral.run(document, opts);
 
-           expect(second).toEqual([
-             expect.objectContaining({
-               code : 'oas3-schema',
-             }),
-           ]);
-         });
+        expect(second).toEqual([
+          expect.objectContaining({
+            code: 'oas3-schema',
+          }),
+        ]);
+      });
     });
   });
 
-  test('should only run recommended rules, whether implicitly or explictly',
-       async () => {
-         const target = {
-           openapi : '3.0.2',
-         };
+  test('should only run recommended rules, whether implicitly or explictly', async () => {
+    const target = {
+      openapi: '3.0.2',
+    };
 
-         await spectral.loadRuleset(recommendedRulesetPath);
+    await spectral.loadRuleset(recommendedRulesetPath);
 
-         expect(Object.keys(spectral.rules)).toHaveLength(3);
+    expect(Object.keys(spectral.rules)).toHaveLength(3);
 
-         expect(Object.entries(spectral.rules)
-                    .map(([ name, rule ]) => [name, rule.enabled]))
-             .toEqual([
-               [ 'explicitly-recommended', true ],
-               [ 'implicitly-recommended', true ],
-               [ 'explicitly-not-recommended', false ],
-             ]);
+    expect(Object.entries(spectral.rules).map(([name, rule]) => [name, rule.enabled])).toEqual([
+      ['explicitly-recommended', true],
+      ['implicitly-recommended', true],
+      ['explicitly-not-recommended', false],
+    ]);
 
-         const res = await spectral.run(target);
+    const res = await spectral.run(target);
 
-         expect(res).toEqual([
-           expect.objectContaining({
-             code : 'explicitly-recommended',
-           }),
-           expect.objectContaining({
-             code : 'implicitly-recommended',
-           }),
-         ]);
-       });
+    expect(res).toEqual([
+      expect.objectContaining({
+        code: 'explicitly-recommended',
+      }),
+      expect.objectContaining({
+        code: 'implicitly-recommended',
+      }),
+    ]);
+  });
 });

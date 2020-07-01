@@ -1,24 +1,23 @@
-import {DiagnosticSeverity} from '@stoplight/types';
-import {RuleType, Spectral} from '../../../spectral';
+import { DiagnosticSeverity } from '@stoplight/types';
+import { RuleType, Spectral } from '../../../spectral';
 import * as ruleset from '../index.json';
 
 describe('operation-singular-tag', () => {
   const s = new Spectral();
   s.setRules({
-    'operation-singular-tag' :
-        Object.assign(ruleset.rules['operation-singular-tag'], {
-          recommended : true,
-          type : RuleType[ruleset.rules['operation-singular-tag'].type],
-        }),
+    'operation-singular-tag': Object.assign(ruleset.rules['operation-singular-tag'], {
+      recommended: true,
+      type: RuleType[ruleset.rules['operation-singular-tag'].type],
+    }),
   });
 
   test('validate a correct object', async () => {
     const results = await s.run({
-      swagger : '2.0',
-      paths : {
-        '/todos' : {
-          get : {
-            tags : [ 'todos' ],
+      swagger: '2.0',
+      paths: {
+        '/todos': {
+          get: {
+            tags: ['todos'],
           },
         },
       },
@@ -28,31 +27,31 @@ describe('operation-singular-tag', () => {
 
   test('return errors if tags has more than 1', async () => {
     const results = await s.run({
-      swagger : '2.0',
-      paths : {
-        '/todos' : {
-          get : {
-            tags : [ 'todos', 'private' ],
+      swagger: '2.0',
+      paths: {
+        '/todos': {
+          get: {
+            tags: ['todos', 'private'],
           },
         },
       },
     });
     expect(results).toEqual([
       {
-        code : 'operation-singular-tag',
-        message : 'Operation may only have one tag.',
-        path : [ 'paths', '/todos', 'get', 'tags' ],
-        range : {
-          end : {
-            character : 19,
-            line : 7,
+        code: 'operation-singular-tag',
+        message: 'Operation may only have one tag.',
+        path: ['paths', '/todos', 'get', 'tags'],
+        range: {
+          end: {
+            character: 19,
+            line: 7,
           },
-          start : {
-            character : 15,
-            line : 5,
+          start: {
+            character: 15,
+            line: 5,
           },
         },
-        severity : DiagnosticSeverity.Warning,
+        severity: DiagnosticSeverity.Warning,
       },
     ]);
   });

@@ -17,9 +17,11 @@ rules:
       function: truthy
 ```
 
-Spectral has [built-in functions](../reference/functions.md) such as `truthy` or `pattern`, which can be used to power rules.
+Spectral has [built-in functions](../reference/functions.md) such as `truthy` or `pattern`, which can be used to power
+rules.
 
-By default, Spectral processes each rule on "resolved document" (a file where all `$ref`s have been resolved. If you would like to have an original input supplied to your rule, you can place `resolved` property as follows:
+By default, Spectral processes each rule on "resolved document" (a file where all `$ref`s have been resolved. If you
+would like to have an original input supplied to your rule, you can place `resolved` property as follows:
 
 ```yaml
 rules:
@@ -33,7 +35,9 @@ rules:
       function: truthy
 ```
 
-You might find `resolved` useful if your rule requires access to `$ref` values specifically, for example if you want to enforce conventions on the folder structure used for [splitting up documents](https://stoplight.io/blog/keeping-openapi-dry-and-portable/).
+You might find `resolved` useful if your rule requires access to `$ref` values specifically, for example if you want to
+enforce conventions on the folder structure used for
+[splitting up documents](https://stoplight.io/blog/keeping-openapi-dry-and-portable/).
 
 In most cases, you will want to operate on resolved document.
 
@@ -60,7 +64,9 @@ then:
   function: truthy
 ```
 
-The `field` keyword is optional, and is for applying the function to a specific property in an object. If omitted the function will be applied to the entire target of the `given` JSON Path. The value can also be `@key` to apply the rule to a keys of an object.
+The `field` keyword is optional, and is for applying the function to a specific property in an object. If omitted the
+function will be applied to the entire target of the `given` JSON Path. The value can also be `@key` to apply the rule
+to a keys of an object.
 
 ```yaml
 given: '$.responses'
@@ -83,7 +89,8 @@ responses:
 
 ## Extending Rules
 
-When extending another ruleset, you can actually extend and modify rules it has declared by adding a rule to your own ruleset with the same name.
+When extending another ruleset, you can actually extend and modify rules it has declared by adding a rule to your own
+ruleset with the same name.
 
 ```yaml
 extends: spectral:oas
@@ -102,7 +109,8 @@ If you're just looking change the severity of the rule, there is a handy shortcu
 
 ### Changing rule severity
 
-Maybe you want to use the rules from the `spectral:oas` ruleset, but instead of `operation-2xx-response` triggering an error you'd like it to trigger a warning instead.
+Maybe you want to use the rules from the `spectral:oas` ruleset, but instead of `operation-2xx-response` triggering an
+error you'd like it to trigger a warning instead.
 
 ```yaml
 extends: spectral:oas
@@ -114,7 +122,8 @@ Available severity levels are `error`, `warn`, `info`, `hint`, and `off`.
 
 ## Disabling rules
 
-This example shows the opposite of the "Enabling Specific rules" example. Sometimes you might want to enable all rules by default, and disable a few.
+This example shows the opposite of the "Enabling Specific rules" example. Sometimes you might want to enable all rules
+by default, and disable a few.
 
 ```yaml
 extends: [[spectral:oas, all]]
@@ -122,11 +131,14 @@ rules:
   operation-operationId-unique: off
 ```
 
-The example above will run all of the rules defined in the `spectral:oas` ruleset (rather than the default behavior that runs only the recommended ones), with one exceptions - we turned `operation-operationId-unique` off.
+The example above will run all of the rules defined in the `spectral:oas` ruleset (rather than the default behavior that
+runs only the recommended ones), with one exceptions - we turned `operation-operationId-unique` off.
 
 ### Enabling Rules
 
-Sometimes you might want to apply specific rules from another ruleset. Use the `extends` property, and pass `off` as the second argument in order to add the rules from another ruleset, but disable them all by default. This allows you to pick and choose which rules you would like to enable.
+Sometimes you might want to apply specific rules from another ruleset. Use the `extends` property, and pass `off` as the
+second argument in order to add the rules from another ruleset, but disable them all by default. This allows you to pick
+and choose which rules you would like to enable.
 
 ```yaml
 extends: [[spectral:oas, off]]
@@ -135,11 +147,13 @@ rules:
   operation-operationId-unique: true
 ```
 
-The example above will run the single rule that we enabled, since we passed `off` to disable all rules by default when extending the `spectral:oas` ruleset.
+The example above will run the single rule that we enabled, since we passed `off` to disable all rules by default when
+extending the `spectral:oas` ruleset.
 
 ### Enriching Messages
 
-To help you create meaningful error messages, Spectral comes with a couple of placeholders that are evaluated at runtime.
+To help you create meaningful error messages, Spectral comes with a couple of placeholders that are evaluated at
+runtime.
 
 - `{{error}}` - the error returned by function
 - `{{description}}` - the description set on the rule

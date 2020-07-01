@@ -1,24 +1,23 @@
-import {DiagnosticSeverity} from '@stoplight/types';
-import {RuleType, Spectral} from '../../../spectral';
+import { DiagnosticSeverity } from '@stoplight/types';
+import { RuleType, Spectral } from '../../../spectral';
 import * as ruleset from '../index.json';
 
 describe('operation-description', () => {
   const s = new Spectral();
   s.setRules({
-    'operation-description' :
-        Object.assign(ruleset.rules['operation-description'], {
-          recommended : true,
-          type : RuleType[ruleset.rules['operation-description'].type],
-        }),
+    'operation-description': Object.assign(ruleset.rules['operation-description'], {
+      recommended: true,
+      type: RuleType[ruleset.rules['operation-description'].type],
+    }),
   });
 
   test('validate a correct object', async () => {
     const results = await s.run({
-      swagger : '2.0',
-      paths : {
-        '/todos' : {
-          get : {
-            description : 'some-description',
+      swagger: '2.0',
+      paths: {
+        '/todos': {
+          get: {
+            description: 'some-description',
           },
         },
       },
@@ -28,40 +27,39 @@ describe('operation-description', () => {
 
   test('return errors if operation description is missing', async () => {
     const results = await s.run({
-      swagger : '2.0',
-      paths : {
-        '/todos' : {
-          get : {},
+      swagger: '2.0',
+      paths: {
+        '/todos': {
+          get: {},
         },
       },
     });
     expect(results).toEqual([
       {
-        code : 'operation-description',
-        message :
-            'Operation `description` must be present and non-empty string.',
-        path : [ 'paths', '/todos', 'get' ],
-        range : {
-          end : {
-            character : 15,
-            line : 4,
+        code: 'operation-description',
+        message: 'Operation `description` must be present and non-empty string.',
+        path: ['paths', '/todos', 'get'],
+        range: {
+          end: {
+            character: 15,
+            line: 4,
           },
-          start : {
-            character : 12,
-            line : 4,
+          start: {
+            character: 12,
+            line: 4,
           },
         },
-        severity : DiagnosticSeverity.Warning,
+        severity: DiagnosticSeverity.Warning,
       },
     ]);
   });
 
   test('does not get called on parameters', async () => {
     const results = await s.run({
-      swagger : '2.0',
-      paths : {
-        '/todos' : {
-          parameters : [],
+      swagger: '2.0',
+      paths: {
+        '/todos': {
+          parameters: [],
         },
       },
     });

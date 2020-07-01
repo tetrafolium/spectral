@@ -1,4 +1,3 @@
-
 # Installation
 
 For many, the easiest way to install Spectral is as a node module.
@@ -15,7 +14,9 @@ yarn global add @stoplight/spectral
 
 ## Executable binaries
 
-For users without Node and/or NPM/Yarn, we provide standalone packages for [all major platforms](https://github.com/stoplightio/spectral/releases). The quickest way to install the appropriate package for your operating system is via this shell script:
+For users without Node and/or NPM/Yarn, we provide standalone packages for
+[all major platforms](https://github.com/stoplightio/spectral/releases). The quickest way to install the appropriate
+package for your operating system is via this shell script:
 
 ```bash
 curl -L https://raw.githack.com/stoplightio/spectral/master/scripts/install.sh | sh
@@ -25,7 +26,8 @@ Note, the binaries do _not_ auto-update, so you will need to run it again to ins
 
 ## Docker
 
-Spectral is also available as a Docker image, which can be handy for all sorts of things, like if you're contributing code to Spectral, want to integrate it into your CI build.
+Spectral is also available as a Docker image, which can be handy for all sorts of things, like if you're contributing
+code to Spectral, want to integrate it into your CI build.
 
 ```bash
 docker run --rm -it stoplight/spectral lint "${url}"`

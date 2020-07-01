@@ -1,6 +1,7 @@
 # Core Functions
 
-Rules use "functions" and those can be custom defined. To save everyone the effort of writing functions for common tasks, Spectral comes with a few bundled out of the box.
+Rules use "functions" and those can be custom defined. To save everyone the effort of writing functions for common
+tasks, Spectral comes with a few bundled out of the box.
 
 ## alphabetical
 
@@ -19,7 +20,7 @@ openapi-tags-alphabetical:
   description: OpenAPI object should have alphabetical `tags`.
   type: style
   recommended: true
-  given: "$"
+  given: '$'
   then:
     field: tags
     function: alphabetical
@@ -43,7 +44,7 @@ Does the field value exist in this set of possible values?
 whitelisted-tags:
   description: Pick from a very restrictive set of tags.
   type: style
-  given: "$.paths.*"
+  given: '$.paths.*'
   then:
     field: tags
     function: enumeration
@@ -56,11 +57,13 @@ whitelisted-tags:
 
 ## falsy
 
-The value should be `false`, `""`, `0`, `null` or `undefined`. Basically anything that would not trigger this: `if (!!targetVal)`.
+The value should be `false`, `""`, `0`, `null` or `undefined`. Basically anything that would not trigger this:
+`if (!!targetVal)`.
 
 ## length
 
-Count the length of a string an or array, the number of properties in an object, or a numeric value, and define minimum and/or maximum values.
+Count the length of a string an or array, the number of properties in an object, or a numeric value, and define minimum
+and/or maximum values.
 
 <!-- title: example -->
 
@@ -68,7 +71,7 @@ Count the length of a string an or array, the number of properties in an object,
 operation-singular-tag:
   description: Operations must have between 1 and 3 tags.
   type: style
-  given: "$.paths.*"
+  given: '$.paths.*'
   then:
     field: tags
     function: length
@@ -94,7 +97,7 @@ Regular expressions!
 path-no-trailing-slash:
   description: Paths should not end with `#/`.
   type: style
-  given: "$.paths[*]~"
+  given: '$.paths[*]~'
   then:
     function: pattern
     functionOptions:
@@ -114,11 +117,12 @@ Text must match a certain case, like `camelCase` or `snake_case`.
 | separator.char         | additional char to separate groups of words             | `string`     | no        |
 | separator.allowLeading | can the group separator char be used at the first char? | `boolean`    | no        |
 
-**Note:** In advanced scenarios, `separator.char` and `separator.allowLeading` can be leveraged to validate certain naming conventions.
-For instance, the following naming style could be enforced:
+**Note:** In advanced scenarios, `separator.char` and `separator.allowLeading` can be leveraged to validate certain
+naming conventions. For instance, the following naming style could be enforced:
 
 - Headers _(eg. `X-YourMighty-Header`)_: type: `pascal`, separator.char: `-`
-- Camel cased paths _(eg. `/path/toThe/amazingResource`)_: type: `camel`, separator.char: `/`, separator.allowLeading: `true`
+- Camel cased paths _(eg. `/path/toThe/amazingResource`)_: type: `camel`, separator.char: `/`, separator.allowLeading:
+  `true`
 
 Available types are:
 
@@ -138,7 +142,7 @@ Available types are:
 camel-case-name:
   description: Name should camelCased.
   type: style
-  given: "$.name"
+  given: '$.name'
   then:
     function: casing
     functionOptions:
@@ -160,10 +164,10 @@ Use JSON Schema (draft 4, 6 or 7) to treat the contents of the \$given JSON Path
 
 ```yaml
 oas3-api-servers:
-  description: "OpenAPI `servers` must be present and non-empty array."
+  description: 'OpenAPI `servers` must be present and non-empty array.'
   recommended: true
-  type: "style"
-  given: "$"
+  type: 'style'
+  given: '$'
   then:
     field: servers
     function: schema
@@ -177,7 +181,9 @@ oas3-api-servers:
 
 ## schemaPath
 
-The schema-path rule is very meta. It is an extension of the schema rule, but it looks for a schema which exists inside the description document. This may never be useful for anything other than the use-case of checking OpenAPI examples are valid:
+The schema-path rule is very meta. It is an extension of the schema rule, but it looks for a schema which exists inside
+the description document. This may never be useful for anything other than the use-case of checking OpenAPI examples are
+valid:
 
 <!-- title: functionOptions -->
 
@@ -192,34 +198,35 @@ The schema-path rule is very meta. It is an extension of the schema rule, but it
 ```yaml
 valid-oas-example-in-parameters:
   description: Examples must be valid against their defined schema.
-  message: "{{error}}"
+  message: '{{error}}'
   recommended: true
   severity: 0
   type: validation
-  given: "$..parameters..[?(@.example && @.schema)]"
+  given: '$..parameters..[?(@.example && @.schema)]'
   then:
     function: schemaPath
     functionOptions:
       field: example
-      schemaPath: "$.schema"
+      schemaPath: '$.schema'
 ```
 
 ## truthy
 
-The value should not be `false`, `""`, `0`, `null` or `undefined`. Basically anything that would not trigger this: `if (targetVal)`.
+The value should not be `false`, `""`, `0`, `null` or `undefined`. Basically anything that would not trigger this:
+`if (targetVal)`.
 
 <!-- title: example -->
 
 ```yaml
 important-fields:
   description: Absolutely must have a title and a description
-  message: "Missing the {{property}}"
-  given: "$"
+  message: 'Missing the {{property}}'
+  given: '$'
   then:
-    - field: "title"
+    - field: 'title'
       function: truthy
 
-    - field: "description"
+    - field: 'description'
       function: truthy
 ```
 
@@ -227,7 +234,8 @@ important-fields:
 
 The value must be `undefined`. When combined with `field: foo` on an object the `foo` property must be undefined.
 
-_**Note:** Due to the way YAML works, just having `foo:` with no value set is not the same as being `undefined`. This would be `falsy`._
+_**Note:** Due to the way YAML works, just having `foo:` with no value set is not the same as being `undefined`. This
+would be `falsy`._
 
 ## unreferencedReusableObject
 
@@ -235,7 +243,8 @@ This function identifies unreferenced objects within a document.
 
 For it to properly operate, `given` should point to the member holding the potential reusable objects.
 
-_Warning:_ This function may identify false positives when used against a specification that acts as a library (a container storing reusable objects, leveraged by other specifications that reference those objects).
+_Warning:_ This function may identify false positives when used against a specification that acts as a library (a
+container storing reusable objects, leveraged by other specifications that reference those objects).
 
 <!-- title: functionOptions -->
 
@@ -251,11 +260,11 @@ unused-definition:
   recommended: true
   type: style
   resolved: false
-  given: "$.definitions"
+  given: '$.definitions'
   then:
     function: unreferencedReusableObject
     functionOptions:
-      reusableObjectsLocation: "#/definitions"
+      reusableObjectsLocation: '#/definitions'
 ```
 
 ## xor
@@ -274,7 +283,7 @@ Communicate that one of these properties is required, and no more than one is al
 components-examples-value-or-externalValue:
   description: Examples should have either a `value` or `externalValue` field.
   type: style
-  given: "$.components.examples.*"
+  given: '$.components.examples.*'
   then:
     function: xor
     functionOptions:

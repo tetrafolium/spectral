@@ -1,16 +1,8 @@
-import {DiagnosticSeverity} from '@stoplight/types';
-import {HumanReadableDiagnosticSeverity, IRule, IThen} from '../../types';
-import {
-  FileRule,
-  FileRuleCollection,
-  FileRulesetSeverity
-} from '../../types/ruleset';
-import {
-  DEFAULT_SEVERITY_LEVEL,
-  getDiagnosticSeverity,
-  getSeverityLevel
-} from '../severity';
-import {isValidRule} from '../validation';
+import { DiagnosticSeverity } from '@stoplight/types';
+import { HumanReadableDiagnosticSeverity, IRule, IThen } from '../../types';
+import { FileRule, FileRuleCollection, FileRulesetSeverity } from '../../types/ruleset';
+import { DEFAULT_SEVERITY_LEVEL, getDiagnosticSeverity, getSeverityLevel } from '../severity';
+import { isValidRule } from '../validation';
 
 /*
 - if rule is object, simple deep merge (or we could replace to be a bit
@@ -23,10 +15,10 @@ given string/number value
 logic as above. optional second
 */
 export function mergeRules(
-    target: FileRuleCollection,
-    source: FileRuleCollection,
-    rulesetSeverity?: FileRulesetSeverity,
-    ): FileRuleCollection {
+  target: FileRuleCollection,
+  source: FileRuleCollection,
+  rulesetSeverity?: FileRulesetSeverity,
+): FileRuleCollection {
   for (const [name, rule] of Object.entries(source)) {
     if (rulesetSeverity !== undefined) {
       const severity = getSeverityLevel(source, name, rulesetSeverity);
@@ -50,112 +42,104 @@ const ROOT_DESCRIPTOR = Symbol('root-descriptor');
 function markRule(rule: IRule): void {
   if (!(ROOT_DESCRIPTOR in rule)) {
     Object.defineProperty(rule, ROOT_DESCRIPTOR, {
-      configurable : false,
-      enumerable : false,
-      writable : false,
-      value : copyRule(rule),
+      configurable: false,
+      enumerable: false,
+      writable: false,
+      value: copyRule(rule),
     });
   }
 }
 
-function updateRootRule(root: IRule, newRule: IRule|null): void {
+function updateRootRule(root: IRule, newRule: IRule | null): void {
   markRule(root);
-  Object.assign(
-      root[ROOT_DESCRIPTOR],
-      copyRule(newRule === null ? root : Object.assign(root, newRule)));
+  Object.assign(root[ROOT_DESCRIPTOR], copyRule(newRule === null ? root : Object.assign(root, newRule)));
 }
 
-function getRootRule(rule: IRule): IRule|null {
+function getRootRule(rule: IRule): IRule | null {
   return rule[ROOT_DESCRIPTOR] !== undefined ? rule[ROOT_DESCRIPTOR] : null;
 }
 
 function copyRuleThen(then: IThen): IThen {
   return {
     ...then,
-    ...('functionOptions' in then ? {...then.functionOptions} : null),
+    ...('functionOptions' in then ? { ...then.functionOptions } : null),
   };
 }
 
 function copyRule(rule: IRule): IRule {
   return {
     ...rule,
-    ...('then' in rule ? {
-      then : Array.isArray(rule.then) ? rule.then.map(copyRuleThen)
-                                      : copyRuleThen(rule.then)
-    }
-                       : null),
+    ...('then' in rule
+      ? {
+          then: Array.isArray(rule.then) ? rule.then.map(copyRuleThen) : copyRuleThen(rule.then),
+        }
+      : null),
   };
 }
 
-function processRule(rules: FileRuleCollection, name: string,
-                     rule: FileRule|FileRulesetSeverity): void {
+function processRule(rules: FileRuleCollection, name: string, rule: FileRule | FileRulesetSeverity): void {
   const existingRule = rules[name];
 
   switch (typeof rule) {
-  case 'boolean':
-    if (isValidRule(existingRule)) {
-      const rootRule = getRootRule(existingRule);
-      if (!rule) {
-        existingRule.severity = -1;
-      } else if (rootRule === null) {
-        existingRule.severity = getSeverityLevel(rules, name, rule);
-        updateRootRule(existingRule, existingRule);
-      } else if ('severity' in rootRule) {
-        existingRule.severity = rootRule.severity;
-        updateRootRule(existingRule, existingRule);
-      } else {
-        existingRule.severity = DiagnosticSeverity.Warning;
-      }
-    }
-    break;
-  case 'string':
-  case 'number':
-    // what if rule does not exist (yet)? throw, store the invalid state
-    // somehow?
-    if (isValidRule(existingRule)) {
-      existingRule.severity = getSeverityLevel(rules, name, rule);
-    }
-
-    break;
-  case 'object':
-    if (Array.isArray(rule)) {
-      processRule(rules, name, rule[0]);
-
-      if (isValidRule(existingRule) && rule.length === 2 &&
-          rule[1] !== undefined) {
-        if ('functionOptions' in existingRule.then) {
-          existingRule.then.functionOptions = rule[1];
+    case 'boolean':
+      if (isValidRule(existingRule)) {
+        const rootRule = getRootRule(existingRule);
+        if (!rule) {
+          existingRule.severity = -1;
+        } else if (rootRule === null) {
+          existingRule.severity = getSeverityLevel(rules, name, rule);
+          updateRootRule(existingRule, existingRule);
+        } else if ('severity' in rootRule) {
+          existingRule.severity = rootRule.severity;
+          updateRootRule(existingRule, existingRule);
+        } else {
+          existingRule.severity = DiagnosticSeverity.Warning;
         }
-
-        updateRootRule(existingRule, null);
       }
-    } else if (isValidRule(existingRule)) {
-      normalizeRule(rule, existingRule.severity);
-      updateRootRule(existingRule, rule);
-    } else {
-      normalizeRule(rule, getSeverityLevel(rules, name, rule));
-      // new rule
-      markRule(rule);
-      rules[name] = rule;
-    }
+      break;
+    case 'string':
+    case 'number':
+      // what if rule does not exist (yet)? throw, store the invalid state
+      // somehow?
+      if (isValidRule(existingRule)) {
+        existingRule.severity = getSeverityLevel(rules, name, rule);
+      }
 
-    break;
-  default:
-    throw new Error('Invalid value for a rule');
+      break;
+    case 'object':
+      if (Array.isArray(rule)) {
+        processRule(rules, name, rule[0]);
+
+        if (isValidRule(existingRule) && rule.length === 2 && rule[1] !== undefined) {
+          if ('functionOptions' in existingRule.then) {
+            existingRule.then.functionOptions = rule[1];
+          }
+
+          updateRootRule(existingRule, null);
+        }
+      } else if (isValidRule(existingRule)) {
+        normalizeRule(rule, existingRule.severity);
+        updateRootRule(existingRule, rule);
+      } else {
+        normalizeRule(rule, getSeverityLevel(rules, name, rule));
+        // new rule
+        markRule(rule);
+        rules[name] = rule;
+      }
+
+      break;
+    default:
+      throw new Error('Invalid value for a rule');
   }
 }
 
-function normalizeRule(rule: IRule, severity: DiagnosticSeverity|
-                       HumanReadableDiagnosticSeverity|undefined): void {
+function normalizeRule(rule: IRule, severity: DiagnosticSeverity | HumanReadableDiagnosticSeverity | undefined): void {
   if (rule.recommended === void 0) {
     rule.recommended = true;
   }
 
   if (rule.severity === void 0) {
-    rule.severity =
-        severity === void 0
-            ? (rule.recommended !== false ? DEFAULT_SEVERITY_LEVEL : -1)
-            : severity;
+    rule.severity = severity === void 0 ? (rule.recommended !== false ? DEFAULT_SEVERITY_LEVEL : -1) : severity;
   } else {
     rule.severity = getDiagnosticSeverity(rule.severity);
   }

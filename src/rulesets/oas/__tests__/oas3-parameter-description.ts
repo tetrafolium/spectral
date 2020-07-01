@@ -1,18 +1,16 @@
-import {DiagnosticSeverity} from '@stoplight/types';
-import {RuleType, Spectral} from '../../../spectral';
-import testParameterDescription from
-    '../../__tests__/shared/_parameter-description';
+import { DiagnosticSeverity } from '@stoplight/types';
+import { RuleType, Spectral } from '../../../spectral';
+import testParameterDescription from '../../__tests__/shared/_parameter-description';
 import * as ruleset from '../index.json';
 
 describe('oas3-parameter-description', () => {
   const s = new Spectral();
   s.registerFormat('oas3', () => true);
   s.setRules({
-    'oas3-parameter-description' :
-        Object.assign(ruleset.rules['oas3-parameter-description'], {
-          recommended : true,
-          type : RuleType[ruleset.rules['oas3-parameter-description'].type],
-        }),
+    'oas3-parameter-description': Object.assign(ruleset.rules['oas3-parameter-description'], {
+      recommended: true,
+      type: RuleType[ruleset.rules['oas3-parameter-description'].type],
+    }),
   });
 
   testParameterDescription(s, 3);
@@ -20,11 +18,11 @@ describe('oas3-parameter-description', () => {
   describe('$.components.parameters', () => {
     it('validates description', async () => {
       const results = await s.run({
-        openapi : '3.0.2',
-        components : {
-          parameters : {
-            address : {
-              in : 'body',
+        openapi: '3.0.2',
+        components: {
+          parameters: {
+            address: {
+              in: 'body',
             },
           },
         },
@@ -32,10 +30,10 @@ describe('oas3-parameter-description', () => {
 
       expect(results).toEqual([
         expect.objectContaining({
-          code : 'oas3-parameter-description',
-          message : 'Parameter objects should have a `description`.',
-          path : [ 'components', 'parameters', 'address' ],
-          severity : DiagnosticSeverity.Warning,
+          code: 'oas3-parameter-description',
+          message: 'Parameter objects should have a `description`.',
+          path: ['components', 'parameters', 'address'],
+          severity: DiagnosticSeverity.Warning,
         }),
       ]);
     });
@@ -68,17 +66,17 @@ describe('oas3-parameter-description', () => {
     describe('links in a response', () => {
       it('does not validate description', async () => {
         const results = await s.run({
-          paths : {
-            '/pets' : {
-              get : {
-                responses : {
-                  '200' : {
-                    links : {
-                      abc : {
-                        parameters : {
-                          param : {
-                            in : 'body',
-                            val : 2,
+          paths: {
+            '/pets': {
+              get: {
+                responses: {
+                  '200': {
+                    links: {
+                      abc: {
+                        parameters: {
+                          param: {
+                            in: 'body',
+                            val: 2,
                           },
                         },
                       },

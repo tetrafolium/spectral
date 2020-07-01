@@ -1,4 +1,4 @@
-import {HumanReadableDiagnosticSeverity} from './rule';
+import { HumanReadableDiagnosticSeverity } from './rule';
 
 export type FailSeverity = HumanReadableDiagnosticSeverity;
 

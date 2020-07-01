@@ -1,15 +1,15 @@
-import {alphabetical} from './alphabetical';
-import {casing} from './casing';
-import {enumeration} from './enumeration';
-import {falsy} from './falsy';
-import {length} from './length';
-import {pattern} from './pattern';
-import {schema} from './schema';
-import {schemaPath} from './schema-path';
-import {truthy} from './truthy';
-import {undefined} from './undefined';
-import {unreferencedReusableObject} from './unreferencedReusableObject';
-import {xor} from './xor';
+import { alphabetical } from './alphabetical';
+import { casing } from './casing';
+import { enumeration } from './enumeration';
+import { falsy } from './falsy';
+import { length } from './length';
+import { pattern } from './pattern';
+import { schema } from './schema';
+import { schemaPath } from './schema-path';
+import { truthy } from './truthy';
+import { undefined } from './undefined';
+import { unreferencedReusableObject } from './unreferencedReusableObject';
+import { xor } from './xor';
 
 export const functions = {
   alphabetical,

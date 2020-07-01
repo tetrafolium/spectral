@@ -1,16 +1,16 @@
 import * as AJV from 'ajv';
-import {ISchemaOptions} from '../../../functions/schema';
-import {IFunction, IFunctionContext, IFunctionResult} from '../../../types';
+import { ISchemaOptions } from '../../../functions/schema';
+import { IFunction, IFunctionContext, IFunctionResult } from '../../../types';
 
 function shouldIgnoreError(error: AJV.ErrorObject) {
   return (
-      // oneOf is a fairly error as we have 2 options to choose from for most of
-      // the time.
-      error.keyword === 'oneOf' ||
-      // the required $ref is entirely useless, since oas-schema rules operate
-      // on resolved content, so there won't be any $refs in the document
-      (error.keyword === 'required' &&
-       (error.params as AJV.RequiredParams).missingProperty === '$ref'));
+    // oneOf is a fairly error as we have 2 options to choose from for most of
+    // the time.
+    error.keyword === 'oneOf' ||
+    // the required $ref is entirely useless, since oas-schema rules operate
+    // on resolved content, so there won't be any $refs in the document
+    (error.keyword === 'required' && (error.params as AJV.RequiredParams).missingProperty === '$ref')
+  );
 }
 
 // this is supposed to cover edge cases we need to cover manually, when it's
@@ -19,12 +19,12 @@ function shouldIgnoreError(error: AJV.ErrorObject) {
 // messages reported by AJV are not quite meaningful
 const ERROR_MAP = [
   {
-    path : /^components\/securitySchemes\/[^/]+$/,
-    message : 'Invalid security scheme',
+    path: /^components\/securitySchemes\/[^/]+$/,
+    message: 'Invalid security scheme',
   },
   {
-    path : /^securityDefinitions\/[^/]+$/,
-    message : 'Invalid security definition',
+    path: /^securityDefinitions\/[^/]+$/,
+    message: 'Invalid security definition',
   },
 ];
 
@@ -45,8 +45,7 @@ export function prepareResults(errors: AJV.ErrorObject[]) {
     if (i + 1 < errors.length && errors[i + 1].dataPath === error.dataPath) {
       errors.splice(i + 1, 1);
       i--;
-    } else if (i > 0 && shouldIgnoreError(error) &&
-               errors[i - 1].dataPath.startsWith(error.dataPath)) {
+    } else if (i > 0 && shouldIgnoreError(error) && errors[i - 1].dataPath.startsWith(error.dataPath)) {
       errors.splice(i, 1);
       i--;
     }
@@ -55,8 +54,7 @@ export function prepareResults(errors: AJV.ErrorObject[]) {
 
 function applyManualReplacements(errors: IFunctionResult[]) {
   for (const error of errors) {
-    if (error.path === void 0)
-      continue;
+    if (error.path === void 0) continue;
 
     const joinedPath = error.path.join('/');
 
@@ -69,10 +67,8 @@ function applyManualReplacements(errors: IFunctionResult[]) {
   }
 }
 
-export const oasDocumentSchema: IFunction<ISchemaOptions> = function(
-    this: IFunctionContext, targetVal, opts, ...args) {
-  const errors = this.functions.schema.call(this, targetVal,
-                                            {...opts, prepareResults}, ...args);
+export const oasDocumentSchema: IFunction<ISchemaOptions> = function(this: IFunctionContext, targetVal, opts, ...args) {
+  const errors = this.functions.schema.call(this, targetVal, { ...opts, prepareResults }, ...args);
 
   if (Array.isArray(errors)) {
     applyManualReplacements(errors);
